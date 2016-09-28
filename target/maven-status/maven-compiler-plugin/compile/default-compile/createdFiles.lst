@@ -1,0 +1,15 @@
+ru/mail/park/main/SessionController$SigInRequest.class
+ru/mail/park/main/SessionController$AutorizedSession.class
+ru/mail/park/main/RegistrationController$1.class
+ru/mail/park/main/SessionController$1.class
+ru/mail/park/Application$1.class
+ru/mail/park/Application.class
+ru/mail/park/main/RegistrationController$DeleteRequest.class
+ru/mail/park/services/AccountService.class
+ru/mail/park/main/SessionController.class
+ru/mail/park/main/RegistrationController$AutorizedSession.class
+ru/mail/park/main/RegistrationController$SuccessResponse.class
+ru/mail/park/main/RegistrationController$RegistrationRequest.class
+ru/mail/park/main/RegistrationController.class
+ru/mail/park/model/UserProfile.class
+ru/mail/park/services/SessionService.class
