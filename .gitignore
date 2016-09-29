@@ -33,6 +33,7 @@
 /out/
 /target/
 tp_java_new.xml
+*.iml
 
 ### Java ###
 *.class
