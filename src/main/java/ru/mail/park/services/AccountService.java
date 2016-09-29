@@ -10,17 +10,17 @@ import java.util.Map;
 public class AccountService {
     private final Map<String, UserProfile> userNameToUser = new HashMap<>();
 
-    public UserProfile addUser(String login, String password, String email) {
-        final UserProfile userProfile = new UserProfile(login, email, password);
-        userNameToUser.put(login, userProfile);
+    public UserProfile addUser(String username, String email, String password) {
+        final UserProfile userProfile = new UserProfile(username, email, password);
+        userNameToUser.put(email, userProfile);
         return userProfile;
     }
 
-    public UserProfile getUser(String login) {
-        return userNameToUser.get(login);
+    public UserProfile getUser(String email) {
+        return userNameToUser.get(email);
     }
 
-    public boolean removeUser(String login) {
-        return userNameToUser.remove(login) != null;
+    public boolean removeUser(String email) {
+        return userNameToUser.remove(email) != null;
     }
 }

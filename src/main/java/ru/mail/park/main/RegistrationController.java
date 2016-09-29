@@ -28,78 +28,83 @@ public class RegistrationController {
     @RequestMapping(path = "/user", method = RequestMethod.POST)
     public ResponseEntity registration(@RequestBody RegistrationRequest body,
                                 HttpSession httpSession) {
+
         final String sessionId = httpSession.getId();
         System.err.println(sessionId);
 
-        final String login = body.getLogin();
+        String username = body.getUsername();
         final String password = body.getPassword();
         final String email = body.getEmail();
-        if (StringUtils.isEmpty(login)
-                || StringUtils.isEmpty(password)
+
+        if (StringUtils.isEmpty(password)
                 || StringUtils.isEmpty(email)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
         }
-        final UserProfile existingUser = accountService.getUser(login);
+
+        final UserProfile existingUser = accountService.getUser(email);
         if (existingUser != null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
         }
 
-        accountService.addUser(login, password, email);
-        sessionService.addAuthorizedLogin(sessionId, login);
+        if(StringUtils.isEmpty(username))
+            username = "User";
+
+        accountService.addUser(username, email, password);
+        sessionService.addAuthorizedLogin(sessionId, email);
         return ResponseEntity.ok(new AutorizedSession(httpSession.getId()));
     }
 
-//бэкдор с ID
 //    Метод получения информации о пользователе
     @RequestMapping(path = "/user", method = RequestMethod.GET)
-    public ResponseEntity getUser(@RequestParam(name = "id") String id) {
+    public ResponseEntity getUser(HttpSession httpSession) {
 
-//        final String ID = body.getSessionId();
-        if (StringUtils.isEmpty(id)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
-        }
+        String sessionId = httpSession.getId();
 
-        final String login = sessionService.getAuthorizedLogin(id);
+        final String email = sessionService.getAuthorizedEmail(sessionId);
 
-        if(login == null)
+        if(email == null)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{}");
 
-        return ResponseEntity.ok(accountService.getUser(login));
+        return ResponseEntity.ok(accountService.getUser(email));
     }
 
 //    Метод удаления пользователя
     @RequestMapping(path = "/user", method = RequestMethod.DELETE)
-    public ResponseEntity deleteUser(@RequestBody DeleteRequest body) {
+    public ResponseEntity deleteUser(@RequestBody DeleteRequest body,
+                                     HttpSession httpSession) {
 
-        if (StringUtils.isEmpty(body.getLogin()) || StringUtils.isEmpty(body.getPassword())) {
+        if(sessionService.getAuthorizedEmail(httpSession.getId()) == null)
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
+
+        if (StringUtils.isEmpty(body.getEmail()) || StringUtils.isEmpty(body.getPassword())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
         }
 
-        final UserProfile userProfile = accountService.getUser(body.getLogin());
+        final UserProfile userProfile = accountService.getUser(body.getEmail());
 
         if(userProfile == null || !userProfile.getPassword().equals(body.getPassword()))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
 
-        accountService.removeUser(body.getLogin());
+        sessionService.removeSession(httpSession.getId());
+        accountService.removeUser(body.getEmail());
 
         return ResponseEntity.ok("{OK}");
     }
 
     private static final class RegistrationRequest {
-        private String login;
-        private String password;
+        private String username;
         private String email;
+        private String password;
 
-        private RegistrationRequest() {}
 
-        private RegistrationRequest(String login, String password, String email) {
-            this.login = login;
-            this.password = password;
+        private RegistrationRequest(String username, String email, String password) {
+            this.username = username;
             this.email = email;
+            this.password = password;
         }
 
-        public String getLogin() {
-            return login;
+        public String getUsername() {
+            return username;
         }
 
         public String getPassword() {
@@ -108,19 +113,6 @@ public class RegistrationController {
 
         public String getEmail() {
             return email;
-        }
-    }
-
-    private static final class SuccessResponse {
-        private final String login;
-
-        private SuccessResponse(String login) {
-            this.login = login;
-        }
-
-        @SuppressWarnings("unused")
-        public String getLogin() {
-            return login;
         }
     }
 
@@ -133,17 +125,15 @@ public class RegistrationController {
     }
 
     private static final class DeleteRequest {
-        private String login;
+        private String email;
         private String password;
 
-        private DeleteRequest() {}
-
-        private DeleteRequest(String login, String password) {
-            this.login    = login;
+        private DeleteRequest(String email, String password) {
+            this.email = email;
             this.password = password;
         }
 
-        public String getLogin() {return login;}
+        public String getEmail() {return email;}
 
         public String getPassword() {return password;}
 

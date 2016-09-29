@@ -25,27 +25,28 @@ public class SessionController {
 
     //    Метод логина пользователя
     @RequestMapping(path = "/session", method = RequestMethod.POST)
-    public ResponseEntity sigIn(@RequestBody SigInRequest body,
+    public ResponseEntity signIn(@RequestBody SignInRequest body,
                                 HttpSession httpSession) {
-        if (StringUtils.isEmpty(body.getLogin())
+
+        if (StringUtils.isEmpty(body.getEmail())
                 || StringUtils.isEmpty(body.getPassword())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
         }
 
-        final UserProfile user = accountService.getUser(body.getLogin());
+        final UserProfile user = accountService.getUser(body.getEmail());
 
         if(user == null || !user.getPassword().equals(body.getPassword())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
         }
 
-        sessionService.addAuthorizedLogin(httpSession.getId(), body.getLogin());
+        sessionService.addAuthorizedLogin(httpSession.getId(), body.getEmail());
 
         return ResponseEntity.ok(new AutorizedSession(httpSession.getId()));
     }
 
     //    Метод логаута пользователя
     @RequestMapping(path = "/session", method = RequestMethod.DELETE)
-    public ResponseEntity sigOut(HttpSession httpSession) {
+    public ResponseEntity signOut(HttpSession httpSession) {
 
         if(sessionService.removeSession(httpSession.getId()))
             return ResponseEntity.ok("{OK}");
@@ -58,23 +59,23 @@ public class SessionController {
     @RequestMapping(path = "/session", method = RequestMethod.GET)
     public ResponseEntity getSession(HttpSession httpSession) {
 
-        if(sessionService.getAuthorizedLogin(httpSession.getId()) != null)
+        if(sessionService.getAuthorizedEmail(httpSession.getId()) != null)
             return ResponseEntity.ok(new AutorizedSession(httpSession.getId()));
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{}");
 
     }
 
-    public static final class SigInRequest {
-        private final String login;
+    public static final class SignInRequest {
+        private final String email;
         private final String password;
 
-        private SigInRequest(String login, String password) {
-            this.login    = login;
+        private SignInRequest(String email, String password) {
+            this.email = email;
             this.password = password;
         }
 
-        public String getLogin() {return login;}
+        public String getEmail() {return email;}
         public String getPassword() {return password;}
 
     }

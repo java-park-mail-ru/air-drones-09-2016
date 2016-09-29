@@ -8,21 +8,20 @@ import java.util.Map;
 
 @Service
 public class SessionService {
-    private final Map<String, String> cookieToLogin = new HashMap<>();
+    private final static  Map<String, String> cookieToEmail = new HashMap<>();
 
-    public String addAuthorizedLogin(String cookie, String login) {
-        cookieToLogin.put(cookie, login);
+    public String addAuthorizedLogin(String cookie, String email) {
+        cookieToEmail.put(cookie, email);
         return cookie;
     }
 
-    public String getAuthorizedLogin(String cookie) {
-       return cookieToLogin.get(cookie);
+    public String getAuthorizedEmail(String cookie) {
+       return cookieToEmail.get(cookie);
     }
 
     public boolean removeSession(String cookie) {
-        return cookieToLogin.remove(cookie) != null;
+        return cookieToEmail.remove(cookie) != null;
     }
-
 
 
 }
