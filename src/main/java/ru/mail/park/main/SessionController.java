@@ -67,8 +67,10 @@ public class SessionController {
     }
 
     public static final class SignInRequest {
-        private final String email;
-        private final String password;
+        private String email;
+        private String password;
+
+        private SignInRequest() {}
 
         private SignInRequest(String email, String password) {
             this.email = email;

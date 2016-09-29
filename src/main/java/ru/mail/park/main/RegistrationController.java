@@ -30,7 +30,6 @@ public class RegistrationController {
                                 HttpSession httpSession) {
 
         final String sessionId = httpSession.getId();
-        System.err.println(sessionId);
 
         String username = body.getUsername();
         final String password = body.getPassword();
@@ -96,6 +95,7 @@ public class RegistrationController {
         private String email;
         private String password;
 
+        private RegistrationRequest() {}
 
         private RegistrationRequest(String username, String email, String password) {
             this.username = username;
@@ -127,6 +127,8 @@ public class RegistrationController {
     private static final class DeleteRequest {
         private String email;
         private String password;
+
+        private DeleteRequest() {}
 
         private DeleteRequest(String email, String password) {
             this.email = email;
