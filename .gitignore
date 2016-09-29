@@ -36,6 +36,7 @@ tp_java_new.xml
 *.iml
 target
 out
+.idea
 
 ### Java ###
 *.class
