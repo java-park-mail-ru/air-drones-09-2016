@@ -1,6 +1,8 @@
-/Users/admin/Work/Технопарк/2_semester/backend/air-drones-09-2016/src/main/java/ru/mail/park/main/RegistrationController.java
-/Users/admin/Work/Технопарк/2_semester/backend/air-drones-09-2016/src/main/java/ru/mail/park/main/SessionController.java
-/Users/admin/Work/Технопарк/2_semester/backend/air-drones-09-2016/src/main/java/ru/mail/park/model/UserProfile.java
-/Users/admin/Work/Технопарк/2_semester/backend/air-drones-09-2016/src/main/java/ru/mail/park/services/AccountService.java
-/Users/admin/Work/Технопарк/2_semester/backend/air-drones-09-2016/src/main/java/ru/mail/park/services/SessionService.java
-/Users/admin/Work/Технопарк/2_semester/backend/air-drones-09-2016/src/main/java/ru/mail/park/Application.java
+/Users/admin/Work/MailRu/2_semester/backend/air-drones-09-2016/src/main/java/ru/mail/park/main/RegistrationController.java
+/Users/admin/Work/MailRu/2_semester/backend/air-drones-09-2016/src/main/java/ru/mail/park/Application.java
+/Users/admin/Work/MailRu/2_semester/backend/air-drones-09-2016/src/main/java/ru/mail/park/main/SessionController.java
+/Users/admin/Work/MailRu/2_semester/backend/air-drones-09-2016/src/main/java/ru/mail/park/model/UserProfile.java
+/Users/admin/Work/MailRu/2_semester/backend/air-drones-09-2016/src/main/java/ru/mail/park/services/implementation/AccountServiceImpl.java
+/Users/admin/Work/MailRu/2_semester/backend/air-drones-09-2016/src/main/java/ru/mail/park/services/implementation/SessionServiceImpl.java
+/Users/admin/Work/MailRu/2_semester/backend/air-drones-09-2016/src/main/java/ru/mail/park/services/interfaces/IAccountService.java
+/Users/admin/Work/MailRu/2_semester/backend/air-drones-09-2016/src/main/java/ru/mail/park/services/interfaces/ISessionService.java

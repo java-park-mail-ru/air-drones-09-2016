@@ -6,19 +6,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.mail.park.model.UserProfile;
-import ru.mail.park.services.AccountService;
-import ru.mail.park.services.SessionService;
+import ru.mail.park.services.implementation.AccountServiceImpl;
+import ru.mail.park.services.implementation.SessionServiceImpl;
 
 import javax.servlet.http.HttpSession;
 
 
 @RestController
 public class RegistrationController {
-    private final AccountService accountService;
-    private final SessionService sessionService;
+    private final AccountServiceImpl accountService;
+    private final SessionServiceImpl sessionService;
 
     @Autowired
-    public RegistrationController(AccountService accountService, SessionService sessionService) {
+    public RegistrationController(AccountServiceImpl accountService, SessionServiceImpl sessionService) {
         this.accountService = accountService;
         this.sessionService = sessionService;
     }
