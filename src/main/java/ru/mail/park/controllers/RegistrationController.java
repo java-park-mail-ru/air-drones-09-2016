@@ -28,7 +28,7 @@ public class RegistrationController {
     }
 
 
-//    Метод создания пользователя
+    //    Метод создания пользователя
     @RequestMapping(path = "/user", method = RequestMethod.POST)
     public ResponseEntity registration(@RequestBody RegistraionReqResp.RegistrationRequest body,
                                 HttpSession httpSession) {
@@ -57,7 +57,7 @@ public class RegistrationController {
         return ResponseEntity.ok(new RegistraionReqResp.AutorizedSessionResponce(httpSession.getId()));
     }
 
-//    Метод получения информации о пользователе
+    //    Метод получения информации о пользователе
     @RequestMapping(path = "/user", method = RequestMethod.GET)
     public ResponseEntity getUser(HttpSession httpSession) {
 
@@ -68,12 +68,16 @@ public class RegistrationController {
         if(email == null)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{}");
 
-        return ResponseEntity.ok(accountService.getUser(email));
+        final UserProfile up =  accountService.getUser(email);
+
+        return ResponseEntity.ok( new RegistraionReqResp.GetUserResponce(
+                up.getEmail(), up.getUsername())
+                /*accountService.getUser(email)*/);
     }
 
-//    Метод удаления пользователя
+    //    Метод удаления пользователя
     @RequestMapping(path = "/user", method = RequestMethod.DELETE)
-    public ResponseEntity deleteUser(@RequestBody RegistraionReqResp.DeleteUserRequest body,
+    public ResponseEntity deleteUser(@RequestBody RegistraionReqResp.UserReqResp body,
                                      HttpSession httpSession) {
 
         if(sessionService.getAuthorizedEmail(httpSession.getId()) == null)
@@ -94,10 +98,9 @@ public class RegistrationController {
 
         return ResponseEntity.ok("{OK}");
     }
-
     //    Метод изменения данных пользователя
     @RequestMapping(path = "/user", method = RequestMethod.PUT)
-    public ResponseEntity putUser(@RequestBody RegistraionReqResp.PutUserRequest body,
+    public ResponseEntity putUser(@RequestBody RegistraionReqResp.PutUserRequest  body,
                                      HttpSession httpSession) {
 
         if(sessionService.getAuthorizedEmail(httpSession.getId()) == null)
@@ -115,6 +118,9 @@ public class RegistrationController {
 
         if(!StringUtils.isEmpty(body.getUsername()))
             userProfile.setUsername(body.getUsername());
+
+        if(!StringUtils.isEmpty(body.getNewPassword()))
+            userProfile.setUsername(body.getNewPassword());
 
         return ResponseEntity.ok("{OK}");
     }

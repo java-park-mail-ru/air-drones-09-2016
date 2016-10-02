@@ -60,16 +60,4 @@ public class SessionController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
 
     }
-
-    //    Метод получает авторизационную сессию
-    @RequestMapping(path = "/session", method = RequestMethod.GET)
-    public ResponseEntity getSession(HttpSession httpSession) {
-
-        if(sessionService.getAuthorizedEmail(httpSession.getId()) != null)
-            return ResponseEntity.ok(new SessionReqResp.AutorizedSessionResponse(httpSession.getId()));
-
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{}");
-
-    }
-
 }

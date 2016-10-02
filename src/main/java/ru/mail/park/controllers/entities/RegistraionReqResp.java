@@ -42,13 +42,13 @@ public final class RegistraionReqResp {
         public String getSessionId() {return  sessionId;}
     }
 
-    public static final class DeleteUserRequest {
+    public static final class UserReqResp {
         private String email;
         private String password;
 
-        private DeleteUserRequest() {}
+        private UserReqResp() {}
 
-        private DeleteUserRequest(String email, String password) {
+        public UserReqResp(String email, String password) {
             this.email = email;
             this.password = password;
         }
@@ -62,23 +62,42 @@ public final class RegistraionReqResp {
     public static final class PutUserRequest {
         private String email;
         private String password;
-        private  String username;
+        private String username;
+        private String newPassword;
 
         private PutUserRequest() {}
 
-        private PutUserRequest(String email, String password, String username) {
-            this.email = email;
-            this.password = password;
-            this.username = username;
+        private PutUserRequest(String email, String password, String username, String newPassword) {
+            this.email       = email;
+            this.password    = password;
+            this.username    = username;
+            this.newPassword = newPassword;
         }
 
         public String getEmail() {return email;}
 
         public String getPassword() {return password;}
 
-        public String getUsername() {
-            return username;
+        public String getUsername() {return username;}
+
+        public String getNewPassword() {return newPassword;}
+
+    }
+
+    public static final class GetUserResponce {
+        private String email;
+        private  String username;
+
+        private GetUserResponce() {}
+
+        public GetUserResponce(String email, String username) {
+            this.email = email;
+            this.username = username;
         }
+
+        public String getEmail() {return email;}
+
+        public String getUsername() { return username; }
 
     }
 
