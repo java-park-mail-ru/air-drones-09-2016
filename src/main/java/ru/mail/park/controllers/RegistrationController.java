@@ -73,7 +73,7 @@ public class RegistrationController {
 
 //    Метод удаления пользователя
     @RequestMapping(path = "/user", method = RequestMethod.DELETE)
-    public ResponseEntity deleteUser(@RequestBody RegistraionReqResp.DeleteRequest body,
+    public ResponseEntity deleteUser(@RequestBody RegistraionReqResp.DeleteUserRequest body,
                                      HttpSession httpSession) {
 
         if(sessionService.getAuthorizedEmail(httpSession.getId()) == null)
@@ -85,8 +85,36 @@ public class RegistrationController {
 
         final UserProfile userProfile = accountService.getUser(body.getEmail());
 
-        if(userProfile == null || !userProfile.getPassword().equals(body.getPassword()))
+        if(userProfile == null || !userProfile.getEmail().equals(body.getEmail()) ||
+                !userProfile.getPassword().equals(body.getPassword()))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
+
+        sessionService.removeSession(httpSession.getId());
+        accountService.removeUser(body.getEmail());
+
+        return ResponseEntity.ok("{OK}");
+    }
+
+    //    Метод изменения данных пользователя
+    @RequestMapping(path = "/user", method = RequestMethod.PUT)
+    public ResponseEntity putUser(@RequestBody RegistraionReqResp.PutUserRequest body,
+                                     HttpSession httpSession) {
+
+        if(sessionService.getAuthorizedEmail(httpSession.getId()) == null)
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
+
+        if (StringUtils.isEmpty(body.getEmail()) || StringUtils.isEmpty(body.getPassword())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
+        }
+
+        final UserProfile userProfile = accountService.getUser(body.getEmail());
+
+        if(userProfile == null || !userProfile.getEmail().equals(body.getEmail()) ||
+                !userProfile.getPassword().equals(body.getPassword()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
+
+        if(!StringUtils.isEmpty(body.getUsername()))
+            userProfile.setUsername(body.getUsername());
 
         sessionService.removeSession(httpSession.getId());
         accountService.removeUser(body.getEmail());

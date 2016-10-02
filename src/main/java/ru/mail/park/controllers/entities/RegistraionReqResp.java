@@ -42,13 +42,13 @@ public final class RegistraionReqResp {
         public String getSessionId() {return  sessionId;}
     }
 
-    public static final class DeleteRequest {
+    public static final class DeleteUserRequest {
         private String email;
         private String password;
 
-        private DeleteRequest() {}
+        private DeleteUserRequest() {}
 
-        private DeleteRequest(String email, String password) {
+        private DeleteUserRequest(String email, String password) {
             this.email = email;
             this.password = password;
         }
@@ -56,6 +56,29 @@ public final class RegistraionReqResp {
         public String getEmail() {return email;}
 
         public String getPassword() {return password;}
+
+    }
+
+    public static final class PutUserRequest {
+        private String email;
+        private String password;
+        private  String username;
+
+        private PutUserRequest() {}
+
+        private PutUserRequest(String email, String password, String username) {
+            this.email = email;
+            this.password = password;
+            this.username = username;
+        }
+
+        public String getEmail() {return email;}
+
+        public String getPassword() {return password;}
+
+        public String getUsername() {
+            return username;
+        }
 
     }
 

@@ -40,7 +40,8 @@ public class SessionController {
 
         final UserProfile user = accountService.getUser(body.getEmail());
 
-        if(user == null || !user.getPassword().equals(body.getPassword())) {
+        if(user == null || !user.getPassword().equals(body.getPassword())
+                ||  !user.getEmail().equals(body.getPassword())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
         }
 
