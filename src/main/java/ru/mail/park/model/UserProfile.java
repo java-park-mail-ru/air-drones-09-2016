@@ -8,9 +8,9 @@ public class UserProfile {
     private static final AtomicLong ID_GENETATOR = new AtomicLong(0);
 
     private final long id;
-    private String username;
-    private String email;
-    private String password;
+    private final String username;
+    private final String email;
+    private final String password;
 
 
     public UserProfile(String username, String email, String password) {

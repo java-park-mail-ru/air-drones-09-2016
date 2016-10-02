@@ -16,11 +16,13 @@ public class Application {
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurerAdapter() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**").allowedOrigins("*");
-            }
-        };
+        return new MyWebMvcConfigurerAdapter();
+    }
+
+    private static class MyWebMvcConfigurerAdapter extends WebMvcConfigurerAdapter {
+        @Override
+        public void addCorsMappings(CorsRegistry registry) {
+            registry.addMapping("/**").allowedOrigins("*");
+        }
     }
 }

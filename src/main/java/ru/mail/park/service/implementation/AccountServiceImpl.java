@@ -1,8 +1,8 @@
-package ru.mail.park.services.implementation;
+package ru.mail.park.service.implementation;
 
 import org.springframework.stereotype.Service;
 import ru.mail.park.model.UserProfile;
-import ru.mail.park.services.interfaces.IAccountService;
+import ru.mail.park.service.interfaces.IAccountService;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -4,10 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import ru.mail.park.controllers.entities.SessionReqResp;
 import ru.mail.park.model.UserProfile;
-import ru.mail.park.services.implementation.AccountServiceImpl;
-import ru.mail.park.services.implementation.SessionServiceImpl;
+import ru.mail.park.service.implementation.AccountServiceImpl;
+import ru.mail.park.service.implementation.SessionServiceImpl;
 
 import javax.servlet.http.HttpSession;
 
@@ -18,14 +22,15 @@ public class SessionController {
     private final SessionServiceImpl sessionService;
 
     @Autowired
-    public SessionController(AccountServiceImpl accountService, SessionServiceImpl sessionService) {
+    public SessionController(AccountServiceImpl accountService,
+                             SessionServiceImpl sessionService) {
         this.accountService = accountService;
         this.sessionService = sessionService;
     }
 
     //    Метод логина пользователя
     @RequestMapping(path = "/session", method = RequestMethod.POST)
-    public ResponseEntity signIn(@RequestBody SignInRequest body,
+    public ResponseEntity signIn(@RequestBody SessionReqResp.SignInRequest body,
                                 HttpSession httpSession) {
 
         if (StringUtils.isEmpty(body.getEmail())
@@ -41,7 +46,7 @@ public class SessionController {
 
         sessionService.addAuthorizedLogin(httpSession.getId(), body.getEmail());
 
-        return ResponseEntity.ok(new AutorizedSession(httpSession.getId()));
+        return ResponseEntity.ok(new SessionReqResp.AutorizedSessionResponse(httpSession.getId()));
     }
 
     //    Метод логаута пользователя
@@ -60,35 +65,10 @@ public class SessionController {
     public ResponseEntity getSession(HttpSession httpSession) {
 
         if(sessionService.getAuthorizedEmail(httpSession.getId()) != null)
-            return ResponseEntity.ok(new AutorizedSession(httpSession.getId()));
+            return ResponseEntity.ok(new SessionReqResp.AutorizedSessionResponse(httpSession.getId()));
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{}");
 
     }
-
-    public static final class SignInRequest {
-        private String email;
-        private String password;
-
-        private SignInRequest() {}
-
-        private SignInRequest(String email, String password) {
-            this.email = email;
-            this.password = password;
-        }
-
-        public String getEmail() {return email;}
-        public String getPassword() {return password;}
-
-    }
-
-    private static  final class AutorizedSession {
-        private final String sessionId;
-
-        private AutorizedSession(String sessionId) {this.sessionId = sessionId;}
-
-        public String getSessionId() {return  sessionId;}
-    }
-
 
 }

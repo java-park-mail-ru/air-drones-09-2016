@@ -1,14 +1,9 @@
-package ru.mail.park.controllers.registration.requests;
+package ru.mail.park.controllers.entities;
 
 /**
  * Created by admin on 02.10.16.
  */
-public class RegistraionReqResp {
-    private static RegistraionReqResp ourInstance = new RegistraionReqResp();
-
-    public static RegistraionReqResp getInstance() {
-        return ourInstance;
-    }
+public final class RegistraionReqResp {
 
     private RegistraionReqResp() {
     }

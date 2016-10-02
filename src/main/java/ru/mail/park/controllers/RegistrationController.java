@@ -4,11 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import ru.mail.park.controllers.entities.RegistraionReqResp;
 import ru.mail.park.model.UserProfile;
-import ru.mail.park.services.implementation.AccountServiceImpl;
-import ru.mail.park.services.implementation.SessionServiceImpl;
-import ru.mail.park.controllers.registration.requests.RegistraionReqResp;
+import ru.mail.park.service.implementation.AccountServiceImpl;
+import ru.mail.park.service.implementation.SessionServiceImpl;
 
 import javax.servlet.http.HttpSession;
 
@@ -58,7 +61,7 @@ public class RegistrationController {
     @RequestMapping(path = "/user", method = RequestMethod.GET)
     public ResponseEntity getUser(HttpSession httpSession) {
 
-        String sessionId = httpSession.getId();
+        final String sessionId = httpSession.getId();
 
         final String email = sessionService.getAuthorizedEmail(sessionId);
 
