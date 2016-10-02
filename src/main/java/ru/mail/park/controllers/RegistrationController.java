@@ -116,9 +116,6 @@ public class RegistrationController {
         if(!StringUtils.isEmpty(body.getUsername()))
             userProfile.setUsername(body.getUsername());
 
-        sessionService.removeSession(httpSession.getId());
-        accountService.removeUser(body.getEmail());
-
         return ResponseEntity.ok("{OK}");
     }
 
