@@ -8,7 +8,7 @@ public class UserProfile {
     private static final AtomicLong ID_GENETATOR = new AtomicLong(0);
 
     private final long id;
-    private final String username;
+    private String username;
     private final String email;
     private final String password;
 
@@ -20,9 +20,9 @@ public class UserProfile {
         this.password = password;
     }
 
-    public String getUsername() {
-        return username;
-    }
+    public String getUsername() { return username; }
+
+    public void setUsername(String username) { this.username = username; }
 
     public String getPassword() {
         return password;
