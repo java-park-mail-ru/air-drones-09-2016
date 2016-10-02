@@ -94,4 +94,31 @@ public class RegistrationController {
         return ResponseEntity.ok("{OK}");
     }
 
+<<<<<<< HEAD
+=======
+    //    Метод изменения данных пользователя
+    @RequestMapping(path = "/user", method = RequestMethod.PUT)
+    public ResponseEntity putUser(@RequestBody RegistraionReqResp.PutUserRequest body,
+                                     HttpSession httpSession) {
+
+        if(sessionService.getAuthorizedEmail(httpSession.getId()) == null)
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
+
+        if (StringUtils.isEmpty(body.getEmail()) || StringUtils.isEmpty(body.getPassword())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
+        }
+
+        final UserProfile userProfile = accountService.getUser(body.getEmail());
+
+        if(userProfile == null || !userProfile.getEmail().equals(body.getEmail()) ||
+                !userProfile.getPassword().equals(body.getPassword()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
+
+        if(!StringUtils.isEmpty(body.getUsername()))
+            userProfile.setUsername(body.getUsername());
+
+        return ResponseEntity.ok("{OK}");
+    }
+
+>>>>>>> 0afb58f... fixed put user
 }
