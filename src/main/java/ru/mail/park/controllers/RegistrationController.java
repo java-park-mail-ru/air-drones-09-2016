@@ -94,7 +94,7 @@ public class RegistrationController {
 
         return ResponseEntity.ok("{OK}");
     }
-    
+
     //    Метод изменения данных пользователя
     @RequestMapping(path = "/user", method = RequestMethod.PUT)
     public ResponseEntity putUser(@RequestBody RegistraionReqResp.PutUserRequest body,
