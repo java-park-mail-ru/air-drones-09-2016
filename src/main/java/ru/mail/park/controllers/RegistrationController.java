@@ -1,4 +1,4 @@
-package ru.mail.park.main;
+package ru.mail.park.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.mail.park.model.UserProfile;
 import ru.mail.park.services.implementation.AccountServiceImpl;
 import ru.mail.park.services.implementation.SessionServiceImpl;
+import ru.mail.park.controllers.registration.requests.RegistraionReqResp;
 
 import javax.servlet.http.HttpSession;
 
@@ -26,7 +27,7 @@ public class RegistrationController {
 
 //    Метод создания пользователя
     @RequestMapping(path = "/user", method = RequestMethod.POST)
-    public ResponseEntity registration(@RequestBody RegistrationRequest body,
+    public ResponseEntity registration(@RequestBody RegistraionReqResp.RegistrationRequest body,
                                 HttpSession httpSession) {
 
         final String sessionId = httpSession.getId();
@@ -50,7 +51,7 @@ public class RegistrationController {
 
         accountService.addUser(username, email, password);
         sessionService.addAuthorizedLogin(sessionId, email);
-        return ResponseEntity.ok(new AutorizedSession(httpSession.getId()));
+        return ResponseEntity.ok(new RegistraionReqResp.AutorizedSessionResponce(httpSession.getId()));
     }
 
 //    Метод получения информации о пользователе
@@ -69,7 +70,7 @@ public class RegistrationController {
 
 //    Метод удаления пользователя
     @RequestMapping(path = "/user", method = RequestMethod.DELETE)
-    public ResponseEntity deleteUser(@RequestBody DeleteRequest body,
+    public ResponseEntity deleteUser(@RequestBody RegistraionReqResp.DeleteRequest body,
                                      HttpSession httpSession) {
 
         if(sessionService.getAuthorizedEmail(httpSession.getId()) == null)
@@ -88,57 +89,6 @@ public class RegistrationController {
         accountService.removeUser(body.getEmail());
 
         return ResponseEntity.ok("{OK}");
-    }
-
-    private static final class RegistrationRequest {
-        private String username;
-        private String email;
-        private String password;
-
-        private RegistrationRequest() {}
-
-        private RegistrationRequest(String username, String email, String password) {
-            this.username = username;
-            this.email = email;
-            this.password = password;
-        }
-
-        public String getUsername() {
-            return username;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public String getEmail() {
-            return email;
-        }
-    }
-
-    private static  final class AutorizedSession {
-        private final String sessionId;
-
-        private AutorizedSession(String sessionId) {this.sessionId = sessionId;}
-
-        public String getSessionId() {return  sessionId;}
-    }
-
-    private static final class DeleteRequest {
-        private String email;
-        private String password;
-
-        private DeleteRequest() {}
-
-        private DeleteRequest(String email, String password) {
-            this.email = email;
-            this.password = password;
-        }
-
-        public String getEmail() {return email;}
-
-        public String getPassword() {return password;}
-
     }
 
 }

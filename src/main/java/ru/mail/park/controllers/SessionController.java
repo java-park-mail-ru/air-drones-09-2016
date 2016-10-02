@@ -1,4 +1,4 @@
-package ru.mail.park.main;
+package ru.mail.park.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
