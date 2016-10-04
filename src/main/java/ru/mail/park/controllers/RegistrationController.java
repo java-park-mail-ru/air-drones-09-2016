@@ -12,17 +12,20 @@ import ru.mail.park.controllers.entities.RegistraionReqResp;
 import ru.mail.park.model.UserProfile;
 import ru.mail.park.service.implementation.AccountServiceImpl;
 import ru.mail.park.service.implementation.SessionServiceImpl;
+import ru.mail.park.service.interfaces.IAccountService;
+import ru.mail.park.service.interfaces.ISessionService;
 
 import javax.servlet.http.HttpSession;
 
 
 @RestController
 public class RegistrationController {
-    private final AccountServiceImpl accountService;
-    private final SessionServiceImpl sessionService;
+    private final IAccountService accountService;
+    private final ISessionService sessionService;
 
     @Autowired
-    public RegistrationController(AccountServiceImpl accountService, SessionServiceImpl sessionService) {
+    public RegistrationController(AccountServiceImpl accountService,
+                                  SessionServiceImpl sessionService) {
         this.accountService = accountService;
         this.sessionService = sessionService;
     }
@@ -120,7 +123,7 @@ public class RegistrationController {
             userProfile.setUsername(body.getUsername());
 
         if(!StringUtils.isEmpty(body.getNewPassword()))
-            userProfile.setUsername(body.getNewPassword());
+            userProfile.setPassword(body.getNewPassword());
 
         return ResponseEntity.ok("{OK}");
     }

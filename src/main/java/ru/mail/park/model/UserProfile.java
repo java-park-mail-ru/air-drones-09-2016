@@ -10,7 +10,7 @@ public class UserProfile {
     private final long id;
     private String username;
     private final String email;
-    private final String password;
+    private String password;
 
 
     public UserProfile(String username, String email, String password) {
@@ -27,6 +27,9 @@ public class UserProfile {
     public String getPassword() {
         return password;
     }
+
+    public void setPassword(String password) { this.password = password; }
+
 
     public String getEmail() { return  email; }
 

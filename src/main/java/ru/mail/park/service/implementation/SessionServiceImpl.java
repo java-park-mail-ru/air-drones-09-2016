@@ -1,13 +1,13 @@
 package ru.mail.park.service.implementation;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import ru.mail.park.service.interfaces.ISessionService;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
-@Service
+@Component
 public class SessionServiceImpl implements ISessionService {
     private static final Map<String, String> COOKIE_TO_EMAIL = new HashMap<>();
 

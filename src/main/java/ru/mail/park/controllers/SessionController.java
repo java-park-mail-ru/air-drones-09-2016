@@ -12,14 +12,16 @@ import ru.mail.park.controllers.entities.SessionReqResp;
 import ru.mail.park.model.UserProfile;
 import ru.mail.park.service.implementation.AccountServiceImpl;
 import ru.mail.park.service.implementation.SessionServiceImpl;
+import ru.mail.park.service.interfaces.IAccountService;
+import ru.mail.park.service.interfaces.ISessionService;
 
 import javax.servlet.http.HttpSession;
 
 @RestController
 public class SessionController {
 
-    private final AccountServiceImpl accountService;
-    private final SessionServiceImpl sessionService;
+    private final IAccountService accountService;
+    private final ISessionService sessionService;
 
     @Autowired
     public SessionController(AccountServiceImpl accountService,

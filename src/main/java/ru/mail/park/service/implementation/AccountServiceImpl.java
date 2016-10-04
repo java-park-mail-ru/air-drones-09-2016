@@ -1,13 +1,13 @@
 package ru.mail.park.service.implementation;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import ru.mail.park.model.UserProfile;
 import ru.mail.park.service.interfaces.IAccountService;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Service
+@Component
 public class AccountServiceImpl implements IAccountService {
     private final Map<String, UserProfile> userNameToUser = new HashMap<>();
 
