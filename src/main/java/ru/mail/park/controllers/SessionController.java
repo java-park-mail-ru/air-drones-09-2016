@@ -44,7 +44,7 @@ public class SessionController {
 
         if(user == null || !user.getPassword().equals(body.getPassword())
                 ||  !user.getEmail().equals(body.getPassword())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
         }
 
         sessionService.addAuthorizedLogin(httpSession.getId(), body.getEmail());
@@ -59,7 +59,7 @@ public class SessionController {
         if(sessionService.removeSession(httpSession.getId()))
             return ResponseEntity.ok("{OK}");
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{}");
 
     }
 }

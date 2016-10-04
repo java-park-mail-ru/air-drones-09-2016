@@ -44,7 +44,7 @@ public class RegistrationController {
 
         if (StringUtils.isEmpty(password)
                 || StringUtils.isEmpty(email)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
         }
 
         final UserProfile existingUser = accountService.getUser(email);
