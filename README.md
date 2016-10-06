@@ -4,8 +4,6 @@ Remastered 09.2016
 
 API https://air-drone-front.herokuapp.com/api/
 
-Konstantin Solovyev https://github.com/KSolovyev
+Dmitriy Zagrebaev https://github.com/DmitryZagr
 
-Ivan Sopov https://github.com/isopov
-
-Dmitriy Frolov https://github.com/d-frolov
+Alma Mater https://park.mail.ru/

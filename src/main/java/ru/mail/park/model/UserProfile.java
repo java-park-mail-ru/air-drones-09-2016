@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class UserProfile {
 
-    private static final AtomicLong ID_GENETATOR = new AtomicLong(0);
+    private static final AtomicLong ID_GENETATOR = new AtomicLong(1);
 
     private final long id;
     private String username;
@@ -14,7 +14,7 @@ public class UserProfile {
 
 
     public UserProfile(String username, String email, String password) {
-        this.id = ID_GENETATOR.getAndAdd(1);
+        this.id = ID_GENETATOR.getAndIncrement();
         this.username = username;
         this.email = email;
         this.password = password;
@@ -29,7 +29,6 @@ public class UserProfile {
     }
 
     public void setPassword(String password) { this.password = password; }
-
 
     public String getEmail() { return  email; }
 

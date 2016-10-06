@@ -4,63 +4,60 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-import ru.mail.park.controllers.entities.RegistraionReqResp;
+import org.springframework.web.bind.annotation.*;
+import ru.mail.park.controllers.api.DeleteUserRequest;
+import ru.mail.park.controllers.api.GetUserResponce;
+import ru.mail.park.controllers.api.PutUserRequest;
+import ru.mail.park.controllers.api.RegistrationRequest;
 import ru.mail.park.model.UserProfile;
 import ru.mail.park.service.implementation.AccountServiceImpl;
 import ru.mail.park.service.implementation.SessionServiceImpl;
 import ru.mail.park.service.interfaces.IAccountService;
 import ru.mail.park.service.interfaces.ISessionService;
+import ru.mail.park.util.RequestValidator;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 
 @RestController
-public class RegistrationController {
+public class UserController {
     private final IAccountService accountService;
     private final ISessionService sessionService;
 
     @Autowired
-    public RegistrationController(AccountServiceImpl accountService,
-                                  SessionServiceImpl sessionService) {
+    public UserController(AccountServiceImpl accountService,
+                          SessionServiceImpl sessionService) {
         this.accountService = accountService;
         this.sessionService = sessionService;
     }
 
 
-    //    Метод создания пользователя
     @RequestMapping(path = "/user", method = RequestMethod.POST)
-    public ResponseEntity registration(@RequestBody RegistraionReqResp.RegistrationRequest body,
-                                HttpSession httpSession) {
+    public ResponseEntity registration( @RequestBody  RegistrationRequest body,
+                                       HttpSession httpSession) {
 
         final String sessionId = httpSession.getId();
-
         String username = body.getUsername();
-        final String password = body.getPassword();
-        final String email = body.getEmail();
 
-        if (StringUtils.isEmpty(password)
-                || StringUtils.isEmpty(email)) {
+        if (!RequestValidator.emailValidate(body.getEmail())
+                && !RequestValidator.passwordValidate(body.getPassword())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
         }
 
-        final UserProfile existingUser = accountService.getUser(email);
+        final UserProfile existingUser = accountService.getUser(body.getEmail());
         if (existingUser != null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
         }
 
-        if(StringUtils.isEmpty(username))
+        if(StringUtils.isEmpty(body.getUsername()))
             username = "User";
 
-        accountService.addUser(username, email, password);
-        sessionService.addAuthorizedLogin(sessionId, email);
-        return ResponseEntity.ok(new RegistraionReqResp.AutorizedSessionResponce(httpSession.getId()));
+        accountService.addUser(username, body.getEmail(), body.getPassword());
+        sessionService.addAuthorizedLogin(sessionId, body.getEmail());
+        return ResponseEntity.ok("{OK}");
     }
 
-    //    Метод получения информации о пользователе
     @RequestMapping(path = "/user", method = RequestMethod.GET)
     public ResponseEntity getUser(HttpSession httpSession) {
 
@@ -73,14 +70,12 @@ public class RegistrationController {
 
         final UserProfile up =  accountService.getUser(email);
 
-        return ResponseEntity.ok( new RegistraionReqResp.GetUserResponce(
-                up.getEmail(), up.getUsername())
-                /*accountService.getUser(email)*/);
+        return ResponseEntity.ok( new GetUserResponce(
+                up.getEmail(), up.getUsername()));
     }
 
-    //    Метод удаления пользователя
     @RequestMapping(path = "/user", method = RequestMethod.DELETE)
-    public ResponseEntity deleteUser(@RequestBody RegistraionReqResp.UserReqResp body,
+    public ResponseEntity deleteUser(@RequestBody @Valid  DeleteUserRequest body,
                                      HttpSession httpSession) {
 
         if(sessionService.getAuthorizedEmail(httpSession.getId()) == null)
@@ -101,9 +96,9 @@ public class RegistrationController {
 
         return ResponseEntity.ok("{OK}");
     }
-    //    Метод изменения данных пользователя
+
     @RequestMapping(path = "/user", method = RequestMethod.PUT)
-    public ResponseEntity putUser(@RequestBody RegistraionReqResp.PutUserRequest  body,
+    public ResponseEntity putUser(@RequestBody PutUserRequest body,
                                      HttpSession httpSession) {
 
         if(sessionService.getAuthorizedEmail(httpSession.getId()) == null)
@@ -123,7 +118,10 @@ public class RegistrationController {
             userProfile.setUsername(body.getUsername());
 
         if(!StringUtils.isEmpty(body.getNewPassword()))
-            userProfile.setPassword(body.getNewPassword());
+            if(!body.getPassword().equals(body.getNewPassword()) &&
+                    RequestValidator.passwordValidate(body.getPassword()))
+                userProfile.setPassword(body.getNewPassword());
+            else ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
 
         return ResponseEntity.ok("{OK}");
     }

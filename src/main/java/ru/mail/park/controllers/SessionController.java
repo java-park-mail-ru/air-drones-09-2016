@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import ru.mail.park.controllers.entities.SessionReqResp;
+import ru.mail.park.controllers.api.SignInRequest;
 import ru.mail.park.model.UserProfile;
 import ru.mail.park.service.implementation.AccountServiceImpl;
 import ru.mail.park.service.implementation.SessionServiceImpl;
@@ -30,9 +30,8 @@ public class SessionController {
         this.sessionService = sessionService;
     }
 
-    //    Метод логина пользователя
     @RequestMapping(path = "/session", method = RequestMethod.POST)
-    public ResponseEntity signIn(@RequestBody SessionReqResp.SignInRequest body,
+    public ResponseEntity signIn(@RequestBody  SignInRequest body,
                                 HttpSession httpSession) {
 
         if (StringUtils.isEmpty(body.getEmail())
@@ -43,16 +42,15 @@ public class SessionController {
         final UserProfile user = accountService.getUser(body.getEmail());
 
         if(user == null || !user.getPassword().equals(body.getPassword())
-                ||  !user.getEmail().equals(body.getPassword())) {
+                ||  !user.getEmail().equals(body.getEmail())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
         }
 
         sessionService.addAuthorizedLogin(httpSession.getId(), body.getEmail());
 
-        return ResponseEntity.ok(new SessionReqResp.AutorizedSessionResponse(httpSession.getId()));
+        return ResponseEntity.ok("{OK}");
     }
 
-    //    Метод логаута пользователя
     @RequestMapping(path = "/session", method = RequestMethod.DELETE)
     public ResponseEntity signOut(HttpSession httpSession) {
 
