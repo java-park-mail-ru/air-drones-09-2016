@@ -31,7 +31,7 @@ public class SessionController {
     }
 
     @RequestMapping(path = "/session", method = RequestMethod.POST)
-    public ResponseEntity signIn(@RequestBody  SignInRequest body,
+    public ResponseEntity signIn(@RequestBody SignInRequest body,
                                 HttpSession httpSession) {
 
         if (StringUtils.isEmpty(body.getEmail())
