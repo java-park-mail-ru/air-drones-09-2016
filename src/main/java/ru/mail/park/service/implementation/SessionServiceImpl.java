@@ -9,7 +9,7 @@ import java.util.Map;
 
 @Component
 public class SessionServiceImpl implements ISessionService {
-    private static final Map<String, String> COOKIE_TO_EMAIL = new HashMap<>();
+    private final Map<String, String> COOKIE_TO_EMAIL = new HashMap<>();
 
     @Override
     public String addAuthorizedLogin(String cookie, String email) {

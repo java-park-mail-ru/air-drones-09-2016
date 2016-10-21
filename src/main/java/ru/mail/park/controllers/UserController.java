@@ -75,7 +75,7 @@ public class UserController {
     }
 
     @RequestMapping(path = "/user", method = RequestMethod.DELETE)
-    public ResponseEntity deleteUser(@RequestBody @Valid  DeleteUserRequest body,
+    public ResponseEntity deleteUser(@RequestBody DeleteUserRequest body,
                                      HttpSession httpSession) {
 
         if(sessionService.getAuthorizedEmail(httpSession.getId()) == null)
@@ -117,10 +117,12 @@ public class UserController {
         if(!StringUtils.isEmpty(body.getUsername()))
             userProfile.setUsername(body.getUsername());
 
-        if(!StringUtils.isEmpty(body.getNewPassword()))
-            if(!body.getPassword().equals(body.getNewPassword()) &&
-                    RequestValidator.passwordValidate(body.getPassword()))
+        if(!StringUtils.isEmpty(body.getNewPassword())) {
+            if (!body.getPassword().equals(body.getNewPassword()) &&
+                    RequestValidator.passwordValidate(body.getPassword())) {
                 userProfile.setPassword(body.getNewPassword());
+            }
+        }
             else ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
 
         return ResponseEntity.ok("{OK}");
