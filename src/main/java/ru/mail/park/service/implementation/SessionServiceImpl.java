@@ -9,22 +9,22 @@ import java.util.Map;
 
 @Component
 public class SessionServiceImpl implements ISessionService {
-    private final Map<String, String> COOKIE_TO_EMAIL = new HashMap<>();
+    private final Map<String, String> cookieToEmail = new HashMap<>();
 
     @Override
     public String addAuthorizedLogin(String cookie, String email) {
-        COOKIE_TO_EMAIL.put(cookie, email);
+        cookieToEmail.put(cookie, email);
         return cookie;
     }
 
     @Override
     public String getAuthorizedEmail(String cookie) {
-       return COOKIE_TO_EMAIL.get(cookie);
+       return cookieToEmail.get(cookie);
     }
 
     @Override
     public boolean removeSession(String cookie) {
-        return COOKIE_TO_EMAIL.remove(cookie) != null;
+        return cookieToEmail.remove(cookie) != null;
     }
 
 }

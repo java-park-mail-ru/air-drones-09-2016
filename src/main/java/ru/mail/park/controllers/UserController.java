@@ -17,7 +17,6 @@ import ru.mail.park.service.interfaces.ISessionService;
 import ru.mail.park.util.RequestValidator;
 
 import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 
 
 @RestController
@@ -117,8 +116,8 @@ public class UserController {
         if(!StringUtils.isEmpty(body.getUsername()))
             userProfile.setUsername(body.getUsername());
 
-        String newPassword = body.getNewPassword();
-        String oldPassword = body.getPassword();
+        final String newPassword = body.getNewPassword();
+        final String oldPassword = body.getPassword();
 
         if(!StringUtils.isEmpty(newPassword)) {
             if (!oldPassword.equals(newPassword) &&
