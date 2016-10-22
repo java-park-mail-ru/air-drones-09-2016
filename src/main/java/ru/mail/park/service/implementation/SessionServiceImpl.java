@@ -27,5 +27,4 @@ public class SessionServiceImpl implements ISessionService {
         return COOKIE_TO_EMAIL.remove(cookie) != null;
     }
 
-
 }

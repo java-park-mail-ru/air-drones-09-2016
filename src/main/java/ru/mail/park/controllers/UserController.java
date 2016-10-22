@@ -117,10 +117,13 @@ public class UserController {
         if(!StringUtils.isEmpty(body.getUsername()))
             userProfile.setUsername(body.getUsername());
 
-        if(!StringUtils.isEmpty(body.getNewPassword())) {
-            if (!body.getPassword().equals(body.getNewPassword()) &&
-                    RequestValidator.passwordValidate(body.getPassword())) {
-                userProfile.setPassword(body.getNewPassword());
+        String newPassword = body.getNewPassword();
+        String oldPassword = body.getPassword();
+
+        if(!StringUtils.isEmpty(newPassword)) {
+            if (!oldPassword.equals(newPassword) &&
+                    RequestValidator.passwordValidate(newPassword)) {
+                userProfile.setPassword(newPassword);
             }
         }
             else ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
