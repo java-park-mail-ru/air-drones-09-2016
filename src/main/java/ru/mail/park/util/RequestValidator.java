@@ -1,5 +1,7 @@
 package ru.mail.park.util;
 
+import ru.mail.park.controllers.api.exeptions.AirDroneExeptions;
+
 /**
  * Created by admin on 06.10.16.
  */
@@ -17,12 +19,18 @@ public class RequestValidator {
 
     private static final String PASSWORD_RULE = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$";
 
-    public static boolean emailValidate(String email) {
-        return email.matches(EMAIL_RULE);
+    public static boolean emailValidate(String email) throws
+                                AirDroneExeptions.UserBadEmailException{
+        if(email == null || !email.matches(EMAIL_RULE))
+            throw new AirDroneExeptions.UserBadEmailException();
+        return true;
     }
 
-    public static boolean passwordValidate(String password) {
-        return password.matches(PASSWORD_RULE);
+    public static boolean passwordValidate(String password) throws
+                                AirDroneExeptions.UserBadPasswordException{
+        if(password == null || !password.matches(PASSWORD_RULE))
+            throw new AirDroneExeptions.UserBadPasswordException();
+        return true;
     }
 
 

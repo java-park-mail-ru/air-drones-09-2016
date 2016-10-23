@@ -9,63 +9,63 @@ import ru.mail.park.controllers.api.DeleteUserRequest;
 import ru.mail.park.controllers.api.GetUserResponce;
 import ru.mail.park.controllers.api.PutUserRequest;
 import ru.mail.park.controllers.api.RegistrationRequest;
-import ru.mail.park.model.UserProfile;
-import ru.mail.park.service.implementation.AccountServiceImpl;
-import ru.mail.park.service.implementation.SessionServiceImpl;
-import ru.mail.park.service.interfaces.IAccountService;
-import ru.mail.park.service.interfaces.ISessionService;
-import ru.mail.park.util.RequestValidator;
+import ru.mail.park.controllers.api.common.ResultJson;
+import ru.mail.park.controllers.api.exeptions.AirDroneExeptions;
+import ru.mail.park.model.user.UserProfile;
+import ru.mail.park.service.interfaces.AbstractAccountService;
+import ru.mail.park.service.interfaces.AbstractSessionService;
 
 import javax.servlet.http.HttpSession;
 
 
 @RestController
 public class UserController {
-    private final IAccountService accountService;
-    private final ISessionService sessionService;
+    private final AbstractAccountService accountService;
+    private final AbstractSessionService sessionService;
 
     @Autowired
-    public UserController(AccountServiceImpl accountService,
-                          SessionServiceImpl sessionService) {
+    public UserController(AbstractAccountService accountService,
+                          AbstractSessionService sessionService) {
         this.accountService = accountService;
         this.sessionService = sessionService;
     }
 
 
-    @RequestMapping(path = "/user", method = RequestMethod.POST)
+    @RequestMapping(path = "/user", method = RequestMethod.POST,
+                                        produces = "application/json")
     public ResponseEntity registration( @RequestBody  RegistrationRequest body,
                                        HttpSession httpSession) {
 
         final String sessionId = httpSession.getId();
         String username = body.getUsername();
 
-        if (!RequestValidator.emailValidate(body.getEmail())
-                && !RequestValidator.passwordValidate(body.getPassword())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
+        try {
+            UserProfile userProfile = accountService.addUser(username,
+                    body.getEmail(), body.getPassword());
+            sessionService.addAuthorizedLogin(sessionId, body.getEmail());
+            userProfile.setPassword(null);
+            return ResponseEntity.status(HttpStatus.OK).body((new ResultJson<UserProfile>(
+                    HttpStatus.OK.value(), userProfile)).getStringResult());
+        } catch (org.jooq.exception.DataAccessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                    (new ResultJson<String>(
+                        HttpStatus.FORBIDDEN.value(),
+                        new AirDroneExeptions.UserExistEmailException().getMessage())).getStringResult());
         }
 
-        final UserProfile existingUser = accountService.getUser(body.getEmail());
-        if (existingUser != null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
-        }
-
-        if(StringUtils.isEmpty(body.getUsername()))
-            username = "User";
-
-        accountService.addUser(username, body.getEmail(), body.getPassword());
-        sessionService.addAuthorizedLogin(sessionId, body.getEmail());
-        return ResponseEntity.ok("{OK}");
+//        return ResponseEntity.ok("{OK}");
     }
 
-    @RequestMapping(path = "/user", method = RequestMethod.GET)
+    @RequestMapping(path = "/user", method = RequestMethod.GET,
+                                            produces = "application/json")
     public ResponseEntity getUser(HttpSession httpSession) {
 
         final String sessionId = httpSession.getId();
 
         final String email = sessionService.getAuthorizedEmail(sessionId);
 
-        if(email == null)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{}");
+//        if(email == null)
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{}");
 
         final UserProfile up =  accountService.getUser(email);
 
@@ -73,12 +73,13 @@ public class UserController {
                 up.getEmail(), up.getUsername()));
     }
 
-    @RequestMapping(path = "/user", method = RequestMethod.DELETE)
+    @RequestMapping(path = "/user", method = RequestMethod.DELETE,
+                                                produces = "application/json")
     public ResponseEntity deleteUser(@RequestBody DeleteUserRequest body,
                                      HttpSession httpSession) {
 
         if(sessionService.getAuthorizedEmail(httpSession.getId()) == null)
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{}");
 
         if (StringUtils.isEmpty(body.getEmail()) || StringUtils.isEmpty(body.getPassword())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
@@ -96,36 +97,40 @@ public class UserController {
         return ResponseEntity.ok("{OK}");
     }
 
-    @RequestMapping(path = "/user", method = RequestMethod.PUT)
+    @RequestMapping(path = "/user", method = RequestMethod.PUT,
+                                        produces = "application/json")
     public ResponseEntity putUser(@RequestBody PutUserRequest body,
                                      HttpSession httpSession) {
 
         if(sessionService.getAuthorizedEmail(httpSession.getId()) == null)
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{}");
 
-        if (StringUtils.isEmpty(body.getEmail()) || StringUtils.isEmpty(body.getPassword())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
-        }
+        accountService.updateUser(body.getUsername(), body.getEmail(),
+                                    body.getPassword(), body.getNewPassword());
 
-        final UserProfile userProfile = accountService.getUser(body.getEmail());
-
-        if(userProfile == null || !userProfile.getEmail().equals(body.getEmail()) ||
-                !userProfile.getPassword().equals(body.getPassword()))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
-
-        if(!StringUtils.isEmpty(body.getUsername()))
-            userProfile.setUsername(body.getUsername());
-
-        final String newPassword = body.getNewPassword();
-        final String oldPassword = body.getPassword();
-
-        if(!StringUtils.isEmpty(newPassword)) {
-            if (!oldPassword.equals(newPassword) &&
-                    RequestValidator.passwordValidate(newPassword)) {
-                userProfile.setPassword(newPassword);
-            }
-        }
-            else ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
+////        if (StringUtils.isEmpty(body.getEmail()) || StringUtils.isEmpty(body.getPassword())) {
+////            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
+////        }
+//
+//        final UserProfile userProfile = accountService.getUser(body.getEmail());
+//
+//        if(userProfile == null || !userProfile.getEmail().equals(body.getEmail()) ||
+//                !userProfile.getPassword().equals(body.getPassword()))
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
+//
+//        if(!StringUtils.isEmpty(body.getUsername()))
+//            userProfile.setUsername(body.getUsername());
+//
+//        final String newPassword = body.getNewPassword();
+//        final String oldPassword = body.getPassword();
+//
+//        if(!StringUtils.isEmpty(newPassword)) {
+//            if (!oldPassword.equals(newPassword) &&
+//                    RequestValidator.passwordValidate(newPassword)) {
+//                userProfile.setPassword(newPassword);
+//            }
+//        }
+//            else ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
 
         return ResponseEntity.ok("{OK}");
     }

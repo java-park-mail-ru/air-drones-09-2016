@@ -1,22 +1,23 @@
-package ru.mail.park.model;
+package ru.mail.park.model.user;
 
 
-import java.util.concurrent.atomic.AtomicLong;
+import ru.mail.park.controllers.api.exeptions.AirDroneExeptions;
+import ru.mail.park.util.RequestValidator;
 
 public class UserProfile {
 
-    private static final AtomicLong ID_GENETATOR = new AtomicLong(1);
-
     private String username;
-    private final String email;
+    private String email;
     private String password;
 
-
-    public UserProfile(String username, String email, String password) {
+    public UserProfile(String username, String email, String password) throws
+            AirDroneExeptions.UserBadEmailException, AirDroneExeptions.UserBadPasswordException {
         this.username = username;
         this.email = email;
         this.password = password;
     }
+
+    public UserProfile() {}
 
     public String getUsername() { return username; }
 
@@ -30,4 +31,7 @@ public class UserProfile {
 
     public String getEmail() { return  email; }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }

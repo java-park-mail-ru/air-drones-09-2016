@@ -9,28 +9,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import ru.mail.park.controllers.api.SignInRequest;
-import ru.mail.park.model.UserProfile;
-import ru.mail.park.service.implementation.AccountServiceImpl;
-import ru.mail.park.service.implementation.SessionServiceImpl;
-import ru.mail.park.service.interfaces.IAccountService;
-import ru.mail.park.service.interfaces.ISessionService;
+import ru.mail.park.model.user.UserProfile;
+import ru.mail.park.service.interfaces.AbstractAccountService;
+import ru.mail.park.service.interfaces.AbstractSessionService;
 
 import javax.servlet.http.HttpSession;
 
 @RestController
 public class SessionController {
 
-    private final IAccountService accountService;
-    private final ISessionService sessionService;
+    private final AbstractAccountService accountService;
+    private final AbstractSessionService sessionService;
 
     @Autowired
-    public SessionController(AccountServiceImpl accountService,
-                             SessionServiceImpl sessionService) {
+    public SessionController(AbstractAccountService accountService,
+                             AbstractSessionService sessionService) {
         this.accountService = accountService;
         this.sessionService = sessionService;
     }
 
-    @RequestMapping(path = "/session", method = RequestMethod.POST)
+    @RequestMapping(path = "/session", method = RequestMethod.POST,
+                                        produces = "application/json")
     public ResponseEntity signIn(@RequestBody SignInRequest body,
                                 HttpSession httpSession) {
 
@@ -51,7 +50,8 @@ public class SessionController {
         return ResponseEntity.ok("{OK}");
     }
 
-    @RequestMapping(path = "/session", method = RequestMethod.DELETE)
+    @RequestMapping(path = "/session", method = RequestMethod.DELETE,
+                                            produces = "application/json")
     public ResponseEntity signOut(HttpSession httpSession) {
 
         if(sessionService.removeSession(httpSession.getId()))
