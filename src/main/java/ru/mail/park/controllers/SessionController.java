@@ -3,61 +3,75 @@ package ru.mail.park.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.CannotCreateTransactionException;
+import org.springframework.web.bind.annotation.*;
 import ru.mail.park.controllers.api.SignInRequest;
-import ru.mail.park.model.UserProfile;
-import ru.mail.park.service.implementation.AccountServiceImpl;
-import ru.mail.park.service.implementation.SessionServiceImpl;
-import ru.mail.park.service.interfaces.IAccountService;
-import ru.mail.park.service.interfaces.ISessionService;
+import ru.mail.park.controllers.api.common.ResultJson;
+import ru.mail.park.controllers.api.exeptions.AirDroneExeptions;
+import ru.mail.park.service.interfaces.AbstractSessionService;
 
 import javax.servlet.http.HttpSession;
+
+import static ru.mail.park.controllers.api.exeptions.AirDroneExeptions.*;
 
 @RestController
 public class SessionController {
 
-    private final IAccountService accountService;
-    private final ISessionService sessionService;
+    private final AbstractSessionService sessionService;
 
     @Autowired
-    public SessionController(AccountServiceImpl accountService,
-                             SessionServiceImpl sessionService) {
-        this.accountService = accountService;
+    public SessionController(AbstractSessionService sessionService) {
         this.sessionService = sessionService;
     }
 
-    @RequestMapping(path = "/session", method = RequestMethod.POST)
+    @RequestMapping(path = "/session", method = RequestMethod.POST,
+                                            produces = "application/json")
     public ResponseEntity signIn(@RequestBody SignInRequest body,
                                 HttpSession httpSession) {
+        try {
+            sessionService.signIn(httpSession.getId(), body.getEmail(), body.getPassword());
 
-        if (StringUtils.isEmpty(body.getEmail())
-                || StringUtils.isEmpty(body.getPassword())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
+        } catch (AirDroneExeptions.UserBadEmailException e) {
+            final String errJson = (new ResultJson<>(HttpStatus.FORBIDDEN.value(),
+                    e.getMessage())).getStringResult();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errJson);
+
+        } catch (UserNotFoundException e) {
+
+            final String errJson = (new ResultJson<>(HttpStatus.NOT_FOUND.value(),
+                    e.getMessage())).getStringResult();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errJson);
+
+        } catch (UserPasswordsDoNotMatchException e) {
+            final String errJson = (new ResultJson<>(HttpStatus.FORBIDDEN.value(),
+                    e.getMessage())).getStringResult();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errJson);
         }
 
-        final UserProfile user = accountService.getUser(body.getEmail());
+        final String json = new ResultJson<>(HttpStatus.OK.value(), "OK").getStringResult();
 
-        if(user == null || !user.getPassword().equals(body.getPassword())
-                ||  !user.getEmail().equals(body.getEmail())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
-        }
-
-        sessionService.addAuthorizedLogin(httpSession.getId(), body.getEmail());
-
-        return ResponseEntity.ok("{OK}");
+        return ResponseEntity.status(HttpStatus.OK).body(json);
     }
 
-    @RequestMapping(path = "/session", method = RequestMethod.DELETE)
+    @RequestMapping(path = "/session", method = RequestMethod.DELETE,
+                                            produces = "application/json")
     public ResponseEntity signOut(HttpSession httpSession) {
-
-        if(sessionService.removeSession(httpSession.getId()))
+        try {
+            sessionService.signOut(httpSession.getId());
             return ResponseEntity.ok("{OK}");
-
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{}");
-
+        } catch (AirDroneExeptions.NotLoggedInException e) {
+            final String errJson = (new ResultJson<>(HttpStatus.UNAUTHORIZED.value(),
+                    new UserNotFoundException().getMessage())).getStringResult();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errJson);
+        }
     }
+
+    @ExceptionHandler({CannotCreateTransactionException.class})
+    @ResponseBody
+    public ResponseEntity resolveIOException() {
+        final String errJson = new ResultJson<>(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS.value(),
+                "DataBaseUnavailible").getStringResult();
+        return ResponseEntity.status(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS).body(errJson);
+    }
+
 }
