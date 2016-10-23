@@ -1,133 +1,144 @@
 package ru.mail.park.controllers;
 
+import org.jooq.exception.DataAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
+import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.web.bind.annotation.*;
 import ru.mail.park.controllers.api.DeleteUserRequest;
-import ru.mail.park.controllers.api.GetUserResponce;
 import ru.mail.park.controllers.api.PutUserRequest;
 import ru.mail.park.controllers.api.RegistrationRequest;
-import ru.mail.park.model.UserProfile;
-import ru.mail.park.service.implementation.AccountServiceImpl;
-import ru.mail.park.service.implementation.SessionServiceImpl;
-import ru.mail.park.service.interfaces.IAccountService;
-import ru.mail.park.service.interfaces.ISessionService;
-import ru.mail.park.util.RequestValidator;
+import ru.mail.park.controllers.api.common.ResultJson;
+import ru.mail.park.controllers.api.exeptions.AirDroneExeptions.*;
+import ru.mail.park.model.user.UserProfile;
+import ru.mail.park.service.interfaces.AbstractAccountService;
+import ru.mail.park.service.interfaces.AbstractSessionService;
 
 import javax.servlet.http.HttpSession;
 
 
 @RestController
 public class UserController {
-    private final IAccountService accountService;
-    private final ISessionService sessionService;
+    private final AbstractAccountService accountService;
+    private final AbstractSessionService sessionService;
 
     @Autowired
-    public UserController(AccountServiceImpl accountService,
-                          SessionServiceImpl sessionService) {
+    public UserController(AbstractAccountService accountService,
+                          AbstractSessionService sessionService) {
         this.accountService = accountService;
         this.sessionService = sessionService;
     }
 
 
-    @RequestMapping(path = "/user", method = RequestMethod.POST)
+    @RequestMapping(path = "/user", method = RequestMethod.POST,
+                                        produces = "application/json")
     public ResponseEntity registration( @RequestBody  RegistrationRequest body,
                                        HttpSession httpSession) {
 
         final String sessionId = httpSession.getId();
-        String username = body.getUsername();
+        final String username = body.getUsername();
+        final String email    = body.getEmail();
+        final String password = body.getPassword();
 
-        if (!RequestValidator.emailValidate(body.getEmail())
-                && !RequestValidator.passwordValidate(body.getPassword())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
+        try{
+            final UserProfile userProfile = accountService.addUser(username, email, password);
+            sessionService.signIn(sessionId, email, body.getPassword());
+            userProfile.setPassword(null);
+            return ResponseEntity.status(HttpStatus.OK).body((new ResultJson<>(
+                    HttpStatus.OK.value(), userProfile)).getStringResult());
+        } catch (DataAccessException e) {
+
+            final String errJson = (new ResultJson<>(HttpStatus.FORBIDDEN.value(),
+                    e.getClass().getName())).getStringResult();
+
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errJson);
         }
-
-        final UserProfile existingUser = accountService.getUser(body.getEmail());
-        if (existingUser != null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
-        }
-
-        if(StringUtils.isEmpty(body.getUsername()))
-            username = "User";
-
-        accountService.addUser(username, body.getEmail(), body.getPassword());
-        sessionService.addAuthorizedLogin(sessionId, body.getEmail());
-        return ResponseEntity.ok("{OK}");
     }
 
-    @RequestMapping(path = "/user", method = RequestMethod.GET)
+    @RequestMapping(path = "/user", method = RequestMethod.GET,
+                                            produces = "application/json")
     public ResponseEntity getUser(HttpSession httpSession) {
 
-        final String sessionId = httpSession.getId();
+        try {
+            final String sessionId = httpSession.getId();
+            final String email = sessionService.getAuthorizedEmail(sessionId);
 
-        final String email = sessionService.getAuthorizedEmail(sessionId);
+            final UserProfile userProfile = accountService.getUser(email);
+            userProfile.setPassword(null);
 
-        if(email == null)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{}");
+            return ResponseEntity.status(HttpStatus.OK).body(new ResultJson<>(
+                    HttpStatus.OK.value(), userProfile).getStringResult());
 
-        final UserProfile up =  accountService.getUser(email);
-
-        return ResponseEntity.ok( new GetUserResponce(
-                up.getEmail(), up.getUsername()));
+        } catch (NotLoggedInException e) {
+            final String errJson = (new ResultJson<>(HttpStatus.FORBIDDEN.value(),
+                    e.getMessage())).getStringResult();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errJson);
+        }
     }
 
-    @RequestMapping(path = "/user", method = RequestMethod.DELETE)
+    @RequestMapping(path = "/user", method = RequestMethod.DELETE,
+                                                produces = "application/json")
     public ResponseEntity deleteUser(@RequestBody DeleteUserRequest body,
                                      HttpSession httpSession) {
 
-        if(sessionService.getAuthorizedEmail(httpSession.getId()) == null)
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
+        try {
+            accountService.removeUser(body.getEmail(), body.getPassword());
+            sessionService.signOut(httpSession.getId());
 
-        if (StringUtils.isEmpty(body.getEmail()) || StringUtils.isEmpty(body.getPassword())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
+        } catch (UserBadEmailException e) {
+            final String errJson = (new ResultJson<>(HttpStatus.BAD_REQUEST.value(),
+                    e.getMessage())).getStringResult();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errJson);
+
+        } catch (UserNotFoundException e) {
+            final String errJson = (new ResultJson<>(HttpStatus.NOT_FOUND.value(),
+                    e.getMessage())).getStringResult();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errJson);
         }
 
-        final UserProfile userProfile = accountService.getUser(body.getEmail());
-
-        if(userProfile == null || !userProfile.getEmail().equals(body.getEmail()) ||
-                !userProfile.getPassword().equals(body.getPassword()))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
-
-        sessionService.removeSession(httpSession.getId());
-        accountService.removeUser(body.getEmail());
-
-        return ResponseEntity.ok("{OK}");
+        final String json = (new ResultJson<>(HttpStatus.OK.value(), "OK")).getStringResult();
+        return ResponseEntity.status(HttpStatus.OK).body(json);
     }
 
-    @RequestMapping(path = "/user", method = RequestMethod.PUT)
+    @RequestMapping(path = "/user", method = RequestMethod.PUT,
+                                        produces = "application/json")
     public ResponseEntity putUser(@RequestBody PutUserRequest body,
                                      HttpSession httpSession) {
 
-        if(sessionService.getAuthorizedEmail(httpSession.getId()) == null)
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
-
-        if (StringUtils.isEmpty(body.getEmail()) || StringUtils.isEmpty(body.getPassword())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
+        try {
+            sessionService.getAuthorizedEmail(httpSession.getId());
+            accountService.updateUser(body.getUsername(), body.getEmail(),
+                    body.getPassword(), body.getNewPassword());
+        } catch (NotLoggedInException e) {
+            final String errJson = (new ResultJson<>(HttpStatus.UNAUTHORIZED.value(),
+                    e.getMessage())).getStringResult();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errJson);
+        } catch (UserPasswordsDoNotMatchException e) {
+            final String errJson = (new ResultJson<>(HttpStatus.BAD_REQUEST.value(),
+                    e.getMessage())).getStringResult();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errJson);
+        } catch (UserBadEmailException e) {
+            final String errJson = (new ResultJson<>(HttpStatus.BAD_REQUEST.value(),
+                    e.getMessage())).getStringResult();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errJson);
+        } catch (UserNotFoundException e) {
+            final String errJson = (new ResultJson<>(HttpStatus.NOT_FOUND.value(),
+                    e.getMessage())).getStringResult();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errJson);
         }
 
-        final UserProfile userProfile = accountService.getUser(body.getEmail());
+        final String json = (new ResultJson<>(HttpStatus.OK.value(), "OK")).getStringResult();
+        return ResponseEntity.status(HttpStatus.OK).body(json);
+    }
 
-        if(userProfile == null || !userProfile.getEmail().equals(body.getEmail()) ||
-                !userProfile.getPassword().equals(body.getPassword()))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
 
-        if(!StringUtils.isEmpty(body.getUsername()))
-            userProfile.setUsername(body.getUsername());
-
-        final String newPassword = body.getNewPassword();
-        final String oldPassword = body.getPassword();
-
-        if(!StringUtils.isEmpty(newPassword)) {
-            if (!oldPassword.equals(newPassword) &&
-                    RequestValidator.passwordValidate(newPassword)) {
-                userProfile.setPassword(newPassword);
-            }
-        }
-            else ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
-
-        return ResponseEntity.ok("{OK}");
+    @ExceptionHandler({CannotCreateTransactionException.class})
+    @ResponseBody
+    public ResponseEntity resolveIOException() {
+        final String errJson = new ResultJson<>(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS.value(),
+                "DataBaseUnavailible").getStringResult();
+        return ResponseEntity.status(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS).body(errJson);
     }
 
 }
