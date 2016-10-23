@@ -83,7 +83,8 @@ public class UserController {
                                      HttpSession httpSession) {
 
         try {
-            accountService.removeUser(body.getEmail(), body.getPassword());
+            String email = sessionService.getAuthorizedEmail(httpSession.getId());
+            accountService.removeUser(email, body.getPassword());
             sessionService.signOut(httpSession.getId());
 
         } catch (UserBadEmailException e) {
