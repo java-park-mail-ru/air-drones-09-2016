@@ -8,4 +8,4 @@ deploy:
   app: 'air-drone'
   on:
     repo: DmitryZagr/air-drones-09-2016
-    branch: tests
+    branch: master

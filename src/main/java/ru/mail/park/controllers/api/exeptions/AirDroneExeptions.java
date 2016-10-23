@@ -49,11 +49,19 @@ public class AirDroneExeptions {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public static class UserOldNewPasswordEqualsException extends RuntimeException {
+    public static class UserPasswordsDoNotMatchException extends RuntimeException {
         @Override
         public String getMessage() {
-            return "UserOldNewPassword";
+            return "UserPasswordsDoNotMatch";
         }
     }
+
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    public static class UserOldNewPasswordEqualsException extends RuntimeException {
+//        @Override
+//        public String getMessage() {
+//            return "UserOldNewPassword";
+//        }
+//    }
 
 }

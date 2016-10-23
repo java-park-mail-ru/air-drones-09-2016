@@ -1,8 +1,10 @@
 package ru.mail.park.controllers;
 
+import org.jooq.exception.DataAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.mail.park.controllers.api.DeleteUserRequest;
@@ -10,7 +12,7 @@ import ru.mail.park.controllers.api.GetUserResponce;
 import ru.mail.park.controllers.api.PutUserRequest;
 import ru.mail.park.controllers.api.RegistrationRequest;
 import ru.mail.park.controllers.api.common.ResultJson;
-import ru.mail.park.controllers.api.exeptions.AirDroneExeptions;
+import ru.mail.park.controllers.api.exeptions.AirDroneExeptions.*;
 import ru.mail.park.model.user.UserProfile;
 import ru.mail.park.service.interfaces.AbstractAccountService;
 import ru.mail.park.service.interfaces.AbstractSessionService;
@@ -37,40 +39,44 @@ public class UserController {
                                        HttpSession httpSession) {
 
         final String sessionId = httpSession.getId();
-        String username = body.getUsername();
+        final String username = body.getUsername();
+        final String email    = body.getEmail();
+        final String password = body.getPassword();
 
-        try {
-            UserProfile userProfile = accountService.addUser(username,
-                    body.getEmail(), body.getPassword());
-            sessionService.addAuthorizedLogin(sessionId, body.getEmail());
+        try{
+            UserProfile userProfile = accountService.addUser(username, email, password);
+            sessionService.signIn(sessionId, email, body.getPassword());
             userProfile.setPassword(null);
             return ResponseEntity.status(HttpStatus.OK).body((new ResultJson<UserProfile>(
                     HttpStatus.OK.value(), userProfile)).getStringResult());
-        } catch (org.jooq.exception.DataAccessException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
-                    (new ResultJson<String>(
-                        HttpStatus.FORBIDDEN.value(),
-                        new AirDroneExeptions.UserExistEmailException().getMessage())).getStringResult());
-        }
+        } catch (DataAccessException e) {
 
-//        return ResponseEntity.ok("{OK}");
+            String errJson = (new ResultJson<String>( HttpStatus.FORBIDDEN.value(),
+                                                    e.getClass().getName())).getStringResult();
+
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errJson);
+        }
     }
 
     @RequestMapping(path = "/user", method = RequestMethod.GET,
                                             produces = "application/json")
     public ResponseEntity getUser(HttpSession httpSession) {
 
-        final String sessionId = httpSession.getId();
+        try {
+            final String sessionId = httpSession.getId();
+            final String email = sessionService.getAuthorizedEmail(sessionId);
 
-        final String email = sessionService.getAuthorizedEmail(sessionId);
+            final UserProfile userProfile = accountService.getUser(email);
+            userProfile.setPassword(null);
 
-//        if(email == null)
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{}");
+            return ResponseEntity.status(HttpStatus.OK).body(new ResultJson<UserProfile>(
+                    HttpStatus.OK.value(), userProfile).getStringResult());
 
-        final UserProfile up =  accountService.getUser(email);
-
-        return ResponseEntity.ok( new GetUserResponce(
-                up.getEmail(), up.getUsername()));
+        } catch (NotLoggedInException e) {
+            String errJson = (new ResultJson<String>( HttpStatus.FORBIDDEN.value(),
+                                                        e.getMessage())).getStringResult();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errJson);
+        }
     }
 
     @RequestMapping(path = "/user", method = RequestMethod.DELETE,
@@ -78,23 +84,23 @@ public class UserController {
     public ResponseEntity deleteUser(@RequestBody DeleteUserRequest body,
                                      HttpSession httpSession) {
 
-        if(sessionService.getAuthorizedEmail(httpSession.getId()) == null)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{}");
+        try {
+            accountService.removeUser(body.getEmail(), body.getPassword());
+            sessionService.signOut(httpSession.getId());
 
-        if (StringUtils.isEmpty(body.getEmail()) || StringUtils.isEmpty(body.getPassword())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
+        } catch (UserBadEmailException e) {
+            String errJson = (new ResultJson<String>( HttpStatus.BAD_REQUEST.value(),
+                    e.getMessage())).getStringResult();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errJson);
+
+        } catch (UserNotFoundException e) {
+            String errJson = (new ResultJson<String>( HttpStatus.NOT_FOUND.value(),
+                    e.getMessage())).getStringResult();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errJson);
         }
 
-        final UserProfile userProfile = accountService.getUser(body.getEmail());
-
-        if(userProfile == null || !userProfile.getEmail().equals(body.getEmail()) ||
-                !userProfile.getPassword().equals(body.getPassword()))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
-
-        sessionService.removeSession(httpSession.getId());
-        accountService.removeUser(body.getEmail());
-
-        return ResponseEntity.ok("{OK}");
+        String json = (new ResultJson<String>( HttpStatus.OK.value(), "OK")).getStringResult();
+        return ResponseEntity.status(HttpStatus.OK).body(json);
     }
 
     @RequestMapping(path = "/user", method = RequestMethod.PUT,
@@ -102,37 +108,36 @@ public class UserController {
     public ResponseEntity putUser(@RequestBody PutUserRequest body,
                                      HttpSession httpSession) {
 
-        if(sessionService.getAuthorizedEmail(httpSession.getId()) == null)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{}");
+        try {
+            sessionService.getAuthorizedEmail(httpSession.getId());
+            accountService.updateUser(body.getUsername(), body.getEmail(),
+                    body.getPassword(), body.getNewPassword());
+        } catch (NotLoggedInException e) {
+            String errJson = (new ResultJson<String>( HttpStatus.UNAUTHORIZED.value(),
+                    e.getMessage())).getStringResult();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errJson);
+        } catch (UserPasswordsDoNotMatchException e) {
+            String errJson = (new ResultJson<String>( HttpStatus.BAD_REQUEST.value(),
+                    e.getMessage())).getStringResult();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errJson);
+        } catch (UserBadEmailException e) {
+            String errJson = (new ResultJson<String>( HttpStatus.BAD_REQUEST.value(),
+                    e.getMessage())).getStringResult();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errJson);
+        }
 
-        accountService.updateUser(body.getUsername(), body.getEmail(),
-                                    body.getPassword(), body.getNewPassword());
 
-////        if (StringUtils.isEmpty(body.getEmail()) || StringUtils.isEmpty(body.getPassword())) {
-////            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
-////        }
-//
-//        final UserProfile userProfile = accountService.getUser(body.getEmail());
-//
-//        if(userProfile == null || !userProfile.getEmail().equals(body.getEmail()) ||
-//                !userProfile.getPassword().equals(body.getPassword()))
-//            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{}");
-//
-//        if(!StringUtils.isEmpty(body.getUsername()))
-//            userProfile.setUsername(body.getUsername());
-//
-//        final String newPassword = body.getNewPassword();
-//        final String oldPassword = body.getPassword();
-//
-//        if(!StringUtils.isEmpty(newPassword)) {
-//            if (!oldPassword.equals(newPassword) &&
-//                    RequestValidator.passwordValidate(newPassword)) {
-//                userProfile.setPassword(newPassword);
-//            }
-//        }
-//            else ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
+        String json = (new ResultJson<String>( HttpStatus.OK.value(), "OK")).getStringResult();
+        return ResponseEntity.status(HttpStatus.OK).body(json);
+    }
 
-        return ResponseEntity.ok("{OK}");
+
+    @ExceptionHandler({CannotCreateTransactionException.class})
+    @ResponseBody
+    public ResponseEntity resolveIOException() {
+        String errJson = new ResultJson<String>( HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS.value(),
+                "DataBaseUnavailible").getStringResult();
+        return ResponseEntity.status(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS).body(errJson);
     }
 
 }
