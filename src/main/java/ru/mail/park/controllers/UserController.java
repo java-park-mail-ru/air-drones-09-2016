@@ -96,6 +96,10 @@ public class UserController {
             final String errJson = (new ResultJson<>(HttpStatus.NOT_FOUND.value(),
                     e.getMessage())).getStringResult();
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errJson);
+        } catch (NotLoggedInException e) {
+            final String errJson = (new ResultJson<>(HttpStatus.UNAUTHORIZED.value(),
+                    e.getMessage())).getStringResult();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errJson);
         }
 
         final String json = (new ResultJson<>(HttpStatus.OK.value(), "OK")).getStringResult();
