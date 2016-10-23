@@ -42,18 +42,13 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
-    public static final UniqueKey<RatingRecord> KEY_RATING_PRIMARY = UniqueKeys0.KEY_RATING_PRIMARY;
-    public static final UniqueKey<RatingRecord> KEY_RATING_IDRATING_UNIQUE = UniqueKeys0.KEY_RATING_IDRATING_UNIQUE;
-    public static final UniqueKey<RatingRecord> KEY_RATING_IDUSER_UNIQUE = UniqueKeys0.KEY_RATING_IDUSER_UNIQUE;
-    public static final UniqueKey<UserRecord> KEY_USER_PRIMARY = UniqueKeys0.KEY_USER_PRIMARY;
-    public static final UniqueKey<UserRecord> KEY_USER_IDUSER_UNIQUE = UniqueKeys0.KEY_USER_IDUSER_UNIQUE;
-    public static final UniqueKey<UserRecord> KEY_USER_EMAIL_UNIQUE = UniqueKeys0.KEY_USER_EMAIL_UNIQUE;
+    public static final UniqueKey<UserRecord> USER_PKEY = UniqueKeys0.USER_PKEY;
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions
     // -------------------------------------------------------------------------
 
-    public static final ForeignKey<RatingRecord, UserRecord> FK_IDUSER = ForeignKeys0.FK_IDUSER;
+    public static final ForeignKey<RatingRecord, UserRecord> RATING__RATING_EMAIL_FKEY = ForeignKeys0.RATING__RATING_EMAIL_FKEY;
 
     // -------------------------------------------------------------------------
     // [#1459] distribute members to avoid static initialisers > 64kb
@@ -65,15 +60,10 @@ public class Keys {
     }
 
     private static class UniqueKeys0 extends AbstractKeys {
-        public static final UniqueKey<RatingRecord> KEY_RATING_PRIMARY = createUniqueKey(Rating.RATING, "KEY_Rating_PRIMARY", Rating.RATING.IDRATING);
-        public static final UniqueKey<RatingRecord> KEY_RATING_IDRATING_UNIQUE = createUniqueKey(Rating.RATING, "KEY_Rating_idRating_UNIQUE", Rating.RATING.IDRATING);
-        public static final UniqueKey<RatingRecord> KEY_RATING_IDUSER_UNIQUE = createUniqueKey(Rating.RATING, "KEY_Rating_idUser_UNIQUE", Rating.RATING.IDUSER);
-        public static final UniqueKey<UserRecord> KEY_USER_PRIMARY = createUniqueKey(User.USER, "KEY_User_PRIMARY", User.USER.IDUSER);
-        public static final UniqueKey<UserRecord> KEY_USER_IDUSER_UNIQUE = createUniqueKey(User.USER, "KEY_User_idUser_UNIQUE", User.USER.IDUSER);
-        public static final UniqueKey<UserRecord> KEY_USER_EMAIL_UNIQUE = createUniqueKey(User.USER, "KEY_User_email_UNIQUE", User.USER.EMAIL);
+        public static final UniqueKey<UserRecord> USER_PKEY = createUniqueKey(User.USER, "user_pkey", User.USER.EMAIL);
     }
 
     private static class ForeignKeys0 extends AbstractKeys {
-        public static final ForeignKey<RatingRecord, UserRecord> FK_IDUSER = createForeignKey(jooq.airdrone.Keys.KEY_USER_PRIMARY, Rating.RATING, "FK_idUser", Rating.RATING.IDRATING);
+        public static final ForeignKey<RatingRecord, UserRecord> RATING__RATING_EMAIL_FKEY = createForeignKey(jooq.airdrone.Keys.USER_PKEY, Rating.RATING, "rating__rating_email_fkey", Rating.RATING.EMAIL);
     }
 }

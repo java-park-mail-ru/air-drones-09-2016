@@ -1,6 +1,7 @@
 package ru.mail.park.service.implementation;
 
 //import jooq.airdrone.Airdrone;
+import jooq.airdrone.tables.Rating;
 import jooq.airdrone.tables.User;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -8,22 +9,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import ru.mail.park.controllers.api.exeptions.AirDroneExeptions;
 import ru.mail.park.model.user.UserProfile;
 import ru.mail.park.service.interfaces.AbstractAccountService;
 import ru.mail.park.util.RequestValidator;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 
 import static ru.mail.park.controllers.api.exeptions.AirDroneExeptions.*;
 
 @Component
 @Transactional
 public class AccountService implements AbstractAccountService {
+
 
     private final DataSource dataSource;
 
@@ -39,12 +37,17 @@ public class AccountService implements AbstractAccountService {
         RequestValidator.emailValidate(email);
         RequestValidator.passwordValidate(password);
 
-        Connection connection = DataSourceUtils.getConnection(dataSource);
+        final Connection connection = DataSourceUtils.getConnection(dataSource);
 
-        DSLContext create = DSL.using(connection);
+        final DSLContext create = DSL.using(connection);
         create.insertInto(User.USER)
                 .columns(User.USER.EMAIL, User.USER.PASSWORD, User.USER.USERNAME)
                 .values(email, password, username).execute();
+
+        create.insertInto(Rating.RATING)
+                .columns(User.USER.EMAIL)
+                .values(email).execute();
+
         create.close();
 
         RequestValidator.emailValidate(email);
@@ -53,23 +56,22 @@ public class AccountService implements AbstractAccountService {
         if(username == null)
             username = "Anonymus";
 
-        final UserProfile userProfile = new UserProfile(username, email, password);
-        return userProfile;
+        return new UserProfile(username, email, password);
     }
 
     @Override
     public UserProfile getUser(String email) {
         RequestValidator.emailValidate(email);
 
-        Connection connection = DataSourceUtils.getConnection(dataSource);
+        final Connection connection = DataSourceUtils.getConnection(dataSource);
 
-        DSLContext create = DSL.using(connection);
-        Result<Record3<String, String, String>> result =
+        final DSLContext create = DSL.using(connection);
+        final Result<Record3<String, String, String>> result =
                 create.select(User.USER.EMAIL, User.USER.PASSWORD, User.USER.USERNAME).
                         from(User.USER)
                         .where(User.USER.EMAIL.equal(email))
                         .fetch();
-        UserProfile userProfile = new UserProfile();
+        final UserProfile userProfile = new UserProfile();
 
         for(Record3<String, String, String> r : result) {
             userProfile.setEmail(r.getValue(User.USER.EMAIL));
@@ -85,21 +87,20 @@ public class AccountService implements AbstractAccountService {
     }
 
     @Override
-    public boolean removeUser(String email, String password) throws UserBadEmailException,
+    public void removeUser(String email, String password) throws UserBadEmailException,
                                                                         UserNotFoundException{
 
         RequestValidator.emailValidate(email);
 
-        UserProfile userProfile = getUser(email);
+        final UserProfile userProfile = getUser(email);
 
        if(!userProfile.getPassword().equals(password))
            throw new UserPasswordsDoNotMatchException();
 
-        Connection connection = DataSourceUtils.getConnection(dataSource);
-        DSLContext create     = DSL.using(connection);
+        final Connection connection = DataSourceUtils.getConnection(dataSource);
+        final DSLContext create     = DSL.using(connection);
         create.delete(User.USER).where(User.USER.EMAIL.equal(email)).execute();
 
-        return true;
     }
 
     @Override
@@ -109,7 +110,7 @@ public class AccountService implements AbstractAccountService {
         RequestValidator.emailValidate(email);
         RequestValidator.passwordValidate(password);
 
-        UserProfile userProfile = getUser(email);
+        final UserProfile userProfile = getUser(email);
         if(userProfile == null)
             throw new UserNotFoundException();
 
@@ -123,6 +124,15 @@ public class AccountService implements AbstractAccountService {
             RequestValidator.passwordValidate(newPassword);
             userProfile.setPassword(newPassword);
         }
+
+        final Connection connection = DataSourceUtils.getConnection(dataSource);
+        final DSLContext create     = DSL.using(connection);
+        create.update(User.USER)
+                .set(User.USER.PASSWORD, userProfile.getPassword())
+                .set(User.USER.USERNAME, userProfile.getUsername())
+                .where(User.USER.EMAIL.equal(userProfile.getEmail())).execute();
+
+        create.close();
     }
 
 }

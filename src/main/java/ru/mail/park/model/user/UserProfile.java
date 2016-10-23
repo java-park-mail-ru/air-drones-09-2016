@@ -1,8 +1,8 @@
 package ru.mail.park.model.user;
 
 
+import org.jetbrains.annotations.Nullable;
 import ru.mail.park.controllers.api.exeptions.AirDroneExeptions;
-import ru.mail.park.util.RequestValidator;
 
 public class UserProfile {
 
@@ -27,7 +27,7 @@ public class UserProfile {
         return password;
     }
 
-    public void setPassword(String password) { this.password = password; }
+    public void setPassword(@Nullable String password) { this.password = password; }
 
     public String getEmail() { return  email; }
 

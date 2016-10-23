@@ -24,12 +24,12 @@ import jooq.airdrone.tables.User;
 public class Tables {
 
     /**
-     * The table <code>airdrone.Rating</code>.
+     * The table <code>airdrone.rating</code>.
      */
     public static final Rating RATING = jooq.airdrone.tables.Rating.RATING;
 
     /**
-     * The table <code>airdrone.User</code>.
+     * The table <code>airdrone.user</code>.
      */
     public static final User USER = jooq.airdrone.tables.User.USER;
 }

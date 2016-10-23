@@ -12,7 +12,7 @@ public interface AbstractAccountService {
 
     UserProfile getUser(String email);
 
-    boolean removeUser(String email, String password);
+    void removeUser(String email, String password);
 
     void updateUser(String username, String email, String password, String newPassword);
 

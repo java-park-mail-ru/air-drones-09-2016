@@ -19,7 +19,6 @@ import org.jooq.Identity;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
-import org.jooq.UniqueKey;
 import org.jooq.impl.TableImpl;
 
 
@@ -36,10 +35,10 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Rating extends TableImpl<RatingRecord> {
 
-    private static final long serialVersionUID = 1982613874;
+    private static final long serialVersionUID = -48962819;
 
     /**
-     * The reference instance of <code>airdrone.Rating</code>
+     * The reference instance of <code>airdrone.rating</code>
      */
     public static final Rating RATING = new Rating();
 
@@ -52,29 +51,29 @@ public class Rating extends TableImpl<RatingRecord> {
     }
 
     /**
-     * The column <code>airdrone.Rating.idRating</code>.
+     * The column <code>airdrone.rating.idrating</code>.
      */
-    public final TableField<RatingRecord, Integer> IDRATING = createField("idRating", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+    public final TableField<RatingRecord, Integer> IDRATING = createField("idrating", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('airdrone.rating_idrating_seq'::regclass)", org.jooq.impl.SQLDataType.INTEGER)), this, "");
 
     /**
-     * The column <code>airdrone.Rating.idUser</code>.
+     * The column <code>airdrone.rating.email</code>.
      */
-    public final TableField<RatingRecord, Integer> IDUSER = createField("idUser", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+    public final TableField<RatingRecord, String> EMAIL = createField("email", org.jooq.impl.SQLDataType.CHAR.length(100).nullable(false), this, "");
 
     /**
-     * The column <code>airdrone.Rating.rating</code>.
+     * The column <code>airdrone.rating.rating</code>.
      */
-    public final TableField<RatingRecord, Integer> RATING_ = createField("rating", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaultValue(org.jooq.impl.DSL.inline("0", org.jooq.impl.SQLDataType.INTEGER)), this, "");
+    public final TableField<RatingRecord, Integer> RATING_ = createField("rating", org.jooq.impl.SQLDataType.INTEGER.defaultValue(org.jooq.impl.DSL.field("0", org.jooq.impl.SQLDataType.INTEGER)), this, "");
 
     /**
-     * Create a <code>airdrone.Rating</code> table reference
+     * Create a <code>airdrone.rating</code> table reference
      */
     public Rating() {
-        this("Rating", null);
+        this("rating", null);
     }
 
     /**
-     * Create an aliased <code>airdrone.Rating</code> table reference
+     * Create an aliased <code>airdrone.rating</code> table reference
      */
     public Rating(String alias) {
         this(alias, RATING);
@@ -108,24 +107,8 @@ public class Rating extends TableImpl<RatingRecord> {
      * {@inheritDoc}
      */
     @Override
-    public UniqueKey<RatingRecord> getPrimaryKey() {
-        return Keys.KEY_RATING_PRIMARY;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<UniqueKey<RatingRecord>> getKeys() {
-        return Arrays.<UniqueKey<RatingRecord>>asList(Keys.KEY_RATING_PRIMARY, Keys.KEY_RATING_IDRATING_UNIQUE, Keys.KEY_RATING_IDUSER_UNIQUE);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public List<ForeignKey<RatingRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<RatingRecord, ?>>asList(Keys.FK_IDUSER);
+        return Arrays.<ForeignKey<RatingRecord, ?>>asList(Keys.RATING__RATING_EMAIL_FKEY);
     }
 
     /**

@@ -2,10 +2,10 @@
 <configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.6.0.xsd">
     <!-- Configure the database connection here -->
     <jdbc>
-        <driver>com.mysql.jdbc.Driver</driver>
-        <url>jdbc:mysql://127.0.0.1:3307/</url>
-        <user>root</user>
-        <password></password>
+        <driver>org.postgresql.Driver</driver>
+        <url>jdbc:postgresql://ec2-54-247-127-6.eu-west-1.compute.amazonaws.com:5432/dfjhvf4usfa081?ssl=true&amp;sslfactory=org.postgresql.ssl.NonValidatingFactory</url>
+        <user>gfnmyoepyvygkd</user>
+        <password>Yg4pQ7h2bfD2RfidE5JvDeNRAu</password>
     </jdbc>
 
     <generator>
@@ -19,7 +19,7 @@
         <database>
             <!-- The database type. The format here is:
                  org.util.[database].[database]Database -->
-            <name>org.jooq.util.mysql.MySQLDatabase</name>
+            <name>org.jooq.util.postgres.PostgresDatabase</name>
 
             <!-- The database schema (or in the absence of schema support, in your RDBMS this
                  can be the owner, user, database name) to be generated -->

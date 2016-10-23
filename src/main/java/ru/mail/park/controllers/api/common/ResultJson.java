@@ -2,22 +2,24 @@ package ru.mail.park.controllers.api.common;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by admin on 11.10.16.
  */
 public class ResultJson<V> {
-    public Result<V> result;
+    private final Result<V> result;
 
     public ResultJson(int code, V type) {
-        this.result = new Result<V>(code, type);
+        this.result = new Result<>(code, type);
     }
 
+    @Nullable
     public String getStringResult() {
 
         String json = null;
 
-        ObjectMapper mapper = new ObjectMapper();
+        final ObjectMapper mapper = new ObjectMapper();
 
         try {
             json = mapper.writeValueAsString(result);

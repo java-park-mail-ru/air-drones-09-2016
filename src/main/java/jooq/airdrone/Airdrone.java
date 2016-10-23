@@ -14,6 +14,7 @@ import jooq.airdrone.tables.Rating;
 import jooq.airdrone.tables.User;
 
 import org.jooq.Catalog;
+import org.jooq.Sequence;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
 
@@ -31,7 +32,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Airdrone extends SchemaImpl {
 
-    private static final long serialVersionUID = 76174888;
+    private static final long serialVersionUID = 1096979345;
 
     /**
      * The reference instance of <code>airdrone</code>
@@ -39,12 +40,12 @@ public class Airdrone extends SchemaImpl {
     public static final Airdrone AIRDRONE = new Airdrone();
 
     /**
-     * The table <code>airdrone.Rating</code>.
+     * The table <code>airdrone.rating</code>.
      */
     public final Rating RATING = jooq.airdrone.tables.Rating.RATING;
 
     /**
-     * The table <code>airdrone.User</code>.
+     * The table <code>airdrone.user</code>.
      */
     public final User USER = jooq.airdrone.tables.User.USER;
 
@@ -62,6 +63,19 @@ public class Airdrone extends SchemaImpl {
     @Override
     public Catalog getCatalog() {
         return DefaultCatalog.DEFAULT_CATALOG;
+    }
+
+    @Override
+    public final List<Sequence<?>> getSequences() {
+        List result = new ArrayList();
+        result.addAll(getSequences0());
+        return result;
+    }
+
+    private final List<Sequence<?>> getSequences0() {
+        return Arrays.<Sequence<?>>asList(
+            Sequences.RATING_IDRATING_SEQ,
+            Sequences.USER_IDUSER_SEQ);
     }
 
     @Override

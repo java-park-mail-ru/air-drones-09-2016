@@ -1,4 +1,4 @@
-package ru.mail.park.model;
+package ru.mail.park.model.user;
 
 import org.junit.Test;
 import ru.mail.park.model.user.UserProfile;
@@ -12,7 +12,7 @@ public class UserProfileTest {
 
     @Test
     public void testCreateUserProfile() {
-        UserProfile userProfile = new UserProfile("username", "user@mail.ru", "123456789");
+        final UserProfile userProfile = new UserProfile("username", "user@mail.ru", "123456789");
         assertEquals("user@mail.ru", userProfile.getEmail());
         assertEquals("username", userProfile.getUsername());
         assertEquals("123456789", userProfile.getPassword());

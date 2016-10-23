@@ -56,12 +56,4 @@ public class AirDroneExeptions {
         }
     }
 
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public static class UserOldNewPasswordEqualsException extends RuntimeException {
-//        @Override
-//        public String getMessage() {
-//            return "UserOldNewPassword";
-//        }
-//    }
-
 }

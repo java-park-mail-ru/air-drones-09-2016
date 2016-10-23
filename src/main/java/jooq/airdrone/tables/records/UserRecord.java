@@ -28,59 +28,59 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Record4<Integer, String, String, String> {
 
-    private static final long serialVersionUID = 778826769;
+    private static final long serialVersionUID = 960240986;
 
     /**
-     * Setter for <code>airdrone.User.idUser</code>.
+     * Setter for <code>airdrone.user.iduser</code>.
      */
     public void setIduser(Integer value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>airdrone.User.idUser</code>.
+     * Getter for <code>airdrone.user.iduser</code>.
      */
     public Integer getIduser() {
         return (Integer) get(0);
     }
 
     /**
-     * Setter for <code>airdrone.User.email</code>.
+     * Setter for <code>airdrone.user.email</code>.
      */
     public void setEmail(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>airdrone.User.email</code>.
+     * Getter for <code>airdrone.user.email</code>.
      */
     public String getEmail() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>airdrone.User.password</code>.
+     * Setter for <code>airdrone.user.password</code>.
      */
     public void setPassword(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>airdrone.User.password</code>.
+     * Getter for <code>airdrone.user.password</code>.
      */
     public String getPassword() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>airdrone.User.username</code>.
+     * Setter for <code>airdrone.user.username</code>.
      */
     public void setUsername(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>airdrone.User.username</code>.
+     * Getter for <code>airdrone.user.username</code>.
      */
     public String getUsername() {
         return (String) get(3);
@@ -94,7 +94,7 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Recor
      * {@inheritDoc}
      */
     @Override
-    public Record1<Integer> key() {
+    public Record1<String> key() {
         return (Record1) super.key();
     }
 

@@ -1,7 +1,5 @@
 package ru.mail.park.util;
 
-import com.sun.org.apache.regexp.internal.RE;
-import org.junit.Assert;
 import org.junit.Test;
 import ru.mail.park.controllers.api.exeptions.AirDroneExeptions;
 
@@ -19,7 +17,6 @@ public class RequestValidatorTest {
 
     @Test
     public void testBadEmail() {
-        final int standard = 5;
         int fails = 0;
 
         try {
@@ -52,19 +49,19 @@ public class RequestValidatorTest {
             fails++;
         }
 
+        final int standard = 5;
         assertEquals(standard, fails);
 
     }
 
 
     @Test
-    public void testPasswordValidate() throws Exception {
+    public void testPasswordValidate() throws AirDroneExeptions.UserBadPasswordException {
         assertEquals(true, RequestValidator.passwordValidate("123456aA"));
     }
 
     @Test
     public void testBadPasswordValidate() throws Exception {
-        final int standard = 5;
         int fails = 0;
 
         try {
@@ -97,6 +94,7 @@ public class RequestValidatorTest {
             fails++;
         }
 
+        final int standard = 5;
         assertEquals(fails, standard);
     }
 

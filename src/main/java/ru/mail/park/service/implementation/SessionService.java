@@ -2,7 +2,6 @@ package ru.mail.park.service.implementation;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.mail.park.controllers.api.exeptions.AirDroneExeptions;
 import ru.mail.park.model.user.UserProfile;
 import ru.mail.park.service.interfaces.AbstractAccountService;
 import ru.mail.park.service.interfaces.AbstractSessionService;
@@ -18,7 +17,7 @@ import static ru.mail.park.controllers.api.exeptions.AirDroneExeptions.*;
 public class SessionService implements AbstractSessionService {
     private final Map<String, String> cookieToEmail = new HashMap<>();
 
-    private AbstractAccountService accountService;
+    private final AbstractAccountService accountService;
 
     @Autowired
     public SessionService(AbstractAccountService accountService) {
@@ -30,15 +29,15 @@ public class SessionService implements AbstractSessionService {
             UserPasswordsDoNotMatchException, UserBadEmailException, UserNotFoundException {
 
         RequestValidator.emailValidate(email);
-        UserProfile userProfile = accountService.getUser(email);
-        if(!userProfile.getPassword().equals(password))
+        final UserProfile userProfile = accountService.getUser(email);
+        if( !userProfile.getPassword().equals(password))
             throw new UserPasswordsDoNotMatchException();
         cookieToEmail.put(cookie, email);
     }
 
     @Override
     public String getAuthorizedEmail(String cookie) throws  NotLoggedInException {
-        String email = cookieToEmail.get(cookie);
+        final String email = cookieToEmail.get(cookie);
         if(email == null)
             throw new NotLoggedInException();
         return cookieToEmail.get(cookie);
@@ -49,5 +48,7 @@ public class SessionService implements AbstractSessionService {
         if(cookieToEmail.remove(cookie) == null)
             throw new NotLoggedInException();
     }
+
+//    public void
 
 }
