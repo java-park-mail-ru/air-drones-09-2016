@@ -50,7 +50,7 @@ public class UserController {
         } catch (DataAccessException e) {
 
             final String errJson = (new ResultJson<>(HttpStatus.FORBIDDEN.value(),
-                    e.getClass().getName())).getStringResult();
+                    e.getMessage())).getStringResult();
 
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errJson);
         }
@@ -83,7 +83,7 @@ public class UserController {
                                      HttpSession httpSession) {
 
         try {
-            String email = sessionService.getAuthorizedEmail(httpSession.getId());
+            final String email = sessionService.getAuthorizedEmail(httpSession.getId());
             accountService.removeUser(email, body.getPassword());
             sessionService.signOut(httpSession.getId());
 

@@ -58,10 +58,13 @@ public class SessionController {
     public ResponseEntity signOut(HttpSession httpSession) {
         try {
             sessionService.signOut(httpSession.getId());
-            return ResponseEntity.ok("{OK}");
+
+            final String json = new ResultJson<>(HttpStatus.OK.value(), "OK").getStringResult();
+            return ResponseEntity.status(HttpStatus.OK).body(json);
+
         } catch (AirDroneExeptions.NotLoggedInException e) {
             final String errJson = (new ResultJson<>(HttpStatus.UNAUTHORIZED.value(),
-                    new UserNotFoundException().getMessage())).getStringResult();
+                   e.getMessage())).getStringResult();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errJson);
         }
     }
