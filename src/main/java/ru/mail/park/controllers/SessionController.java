@@ -48,8 +48,7 @@ public class SessionController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errJson);
         }
 
-        final String json = new ResultJson<>(HttpStatus.OK.value(),
-                "OK").getStringResult();
+        final String json = new ResultJson<>(HttpStatus.OK.value(), "OK").getStringResult();
 
         return ResponseEntity.status(HttpStatus.OK).body(json);
     }
@@ -65,8 +64,6 @@ public class SessionController {
                     new UserNotFoundException().getMessage())).getStringResult();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errJson);
         }
-//        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{}");
-
     }
 
     @ExceptionHandler({CannotCreateTransactionException.class})
