@@ -3,7 +3,6 @@ package jooq.airdrone;
 
 import javax.annotation.Generated;
 
-import jooq.airdrone.tables.Rating;
 import jooq.airdrone.tables.User;
 
 
@@ -19,11 +18,6 @@ import jooq.airdrone.tables.User;
 )
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tables {
-
-    /**
-     * The table <code>airdrone.rating</code>.
-     */
-    public static final Rating RATING = jooq.airdrone.tables.Rating.RATING;
 
     /**
      * The table <code>airdrone.user</code>.

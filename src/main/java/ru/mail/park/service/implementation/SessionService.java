@@ -1,16 +1,17 @@
 package ru.mail.park.service.implementation;
 
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.park.model.user.UserProfile;
 import ru.mail.park.service.interfaces.AbstractAccountService;
 import ru.mail.park.service.interfaces.AbstractSessionService;
-import ru.mail.park.util.RequestValidator;
+import static ru.mail.park.util.RequestValidator.emailValidate;
+import static ru.mail.park.util.RequestValidator.passwordValidate;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static ru.mail.park.controllers.api.exeptions.AirDroneExeptions.*;
 
 
 @Component
@@ -25,30 +26,36 @@ public class SessionService implements AbstractSessionService {
     }
 
     @Override
-    public void signIn(String cookie, String email, String password) throws
-            UserPasswordsDoNotMatchException, UserBadEmailException, UserNotFoundException {
+    public boolean signIn(String cookie, String email, String password)  {
 
-        RequestValidator.emailValidate(email);
+        if(!emailValidate(email) || !passwordValidate(password))
+            return false;
+
         final UserProfile userProfile = accountService.getUser(email);
+
+        if(userProfile == null)
+            return false;
+
         if( !userProfile.getPassword().equals(password))
-            throw new UserPasswordsDoNotMatchException();
+            return false;
+
         cookieToEmail.put(cookie, email);
+
+        return true;
     }
 
+    @Nullable
     @Override
-    public String getAuthorizedEmail(String cookie) throws  NotLoggedInException {
+    public String getAuthorizedEmail(String cookie)  {
         final String email = cookieToEmail.get(cookie);
         if(email == null)
-            throw new NotLoggedInException();
-        return cookieToEmail.get(cookie);
+            return null;
+        return email;
     }
 
     @Override
-    public void signOut(String cookie) throws NotLoggedInException {
-        if(cookieToEmail.remove(cookie) == null)
-            throw new NotLoggedInException();
+    public boolean signOut(String cookie)  {
+        return cookieToEmail.remove(cookie) != null;
     }
-
-//    public void
 
 }

@@ -8,12 +8,12 @@ import ru.mail.park.model.user.UserProfile;
  */
 @Component
 public interface AbstractAccountService {
-    UserProfile addUser(String username, String email, String password);
+    boolean addUser(String username, String email, String password);
 
     UserProfile getUser(String email);
 
-    void removeUser(String email, String password);
+    boolean removeUser(String email, String password);
 
-    void updateUser(String username, String email, String password, String newPassword);
+    boolean updateUser(String username, String email, String password, String newPassword);
 
 }

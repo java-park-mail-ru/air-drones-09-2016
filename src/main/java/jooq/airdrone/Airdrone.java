@@ -7,7 +7,6 @@ import java.util.List;
 
 import javax.annotation.Generated;
 
-import jooq.airdrone.tables.Rating;
 import jooq.airdrone.tables.User;
 
 import org.jooq.Catalog;
@@ -29,17 +28,12 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Airdrone extends SchemaImpl {
 
-    private static final long serialVersionUID = 1096979345;
+    private static final long serialVersionUID = -896984632;
 
     /**
      * The reference instance of <code>airdrone</code>
      */
     public static final Airdrone AIRDRONE = new Airdrone();
-
-    /**
-     * The table <code>airdrone.rating</code>.
-     */
-    public final Rating RATING = jooq.airdrone.tables.Rating.RATING;
 
     /**
      * The table <code>airdrone.user</code>.
@@ -71,7 +65,6 @@ public class Airdrone extends SchemaImpl {
 
     private final List<Sequence<?>> getSequences0() {
         return Arrays.<Sequence<?>>asList(
-            Sequences.RATING_IDRATING_SEQ,
             Sequences.USER_IDUSER_SEQ);
     }
 
@@ -84,7 +77,6 @@ public class Airdrone extends SchemaImpl {
 
     private final List<Table<?>> getTables0() {
         return Arrays.<Table<?>>asList(
-            Rating.RATING,
             User.USER);
     }
 }

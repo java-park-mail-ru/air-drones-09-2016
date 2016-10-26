@@ -32,7 +32,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class User extends TableImpl<UserRecord> {
 
-    private static final long serialVersionUID = -530535701;
+    private static final long serialVersionUID = -2046335600;
 
     /**
      * The reference instance of <code>airdrone.user</code>
@@ -55,17 +55,22 @@ public class User extends TableImpl<UserRecord> {
     /**
      * The column <code>airdrone.user.email</code>.
      */
-    public final TableField<UserRecord, String> EMAIL = createField("email", org.jooq.impl.SQLDataType.CHAR.length(100).nullable(false), this, "");
+    public final TableField<UserRecord, String> EMAIL = createField("email", org.jooq.impl.SQLDataType.VARCHAR.length(100).nullable(false), this, "");
 
     /**
      * The column <code>airdrone.user.password</code>.
      */
-    public final TableField<UserRecord, String> PASSWORD = createField("password", org.jooq.impl.SQLDataType.CHAR.length(100).nullable(false), this, "");
+    public final TableField<UserRecord, String> PASSWORD = createField("password", org.jooq.impl.SQLDataType.VARCHAR.length(100).nullable(false), this, "");
 
     /**
      * The column <code>airdrone.user.username</code>.
      */
-    public final TableField<UserRecord, String> USERNAME = createField("username", org.jooq.impl.SQLDataType.CHAR.length(100), this, "");
+    public final TableField<UserRecord, String> USERNAME = createField("username", org.jooq.impl.SQLDataType.VARCHAR.length(100), this, "");
+
+    /**
+     * The column <code>airdrone.user.rating</code>.
+     */
+    public final TableField<UserRecord, Integer> RATING = createField("rating", org.jooq.impl.SQLDataType.INTEGER.defaultValue(org.jooq.impl.DSL.field("0", org.jooq.impl.SQLDataType.INTEGER)), this, "");
 
     /**
      * Create a <code>airdrone.user</code> table reference

@@ -1,20 +1,29 @@
 package ru.mail.park.model.user;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.jetbrains.annotations.Nullable;
-import ru.mail.park.controllers.api.exeptions.AirDroneExeptions;
 
 public class UserProfile {
 
-    private String username;
-    private String email;
-    private String password;
+    private String  username;
+    private String  email;
+    @JsonIgnore
+    private String  password;
+    private int rating = 0;
 
-    public UserProfile(String username, String email, String password) throws
-            AirDroneExeptions.UserBadEmailException, AirDroneExeptions.UserBadPasswordException {
+    public UserProfile(String username, String email, String password) {
         this.username = username;
         this.email = email;
         this.password = password;
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
     }
 
     public UserProfile() {}

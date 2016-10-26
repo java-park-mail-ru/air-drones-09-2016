@@ -9,7 +9,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
-import ru.mail.park.controllers.api.exeptions.AirDroneExeptions;
 import ru.mail.park.model.user.UserProfile;
 import ru.mail.park.service.interfaces.AbstractAccountService;
 
@@ -47,32 +46,37 @@ public class AccountServiceTest {
         assertEquals(userProfile.getPassword(), "kmweiNIBQFIUb278h");
     }
 
-    @Test(expected = AirDroneExeptions.UserNotFoundException.class)
-    public void addUserNotFound() {
-        accountService.getUser("userusqfer@mail.ru");
-    }
+    @Test
+    public void getUserTest() {
 
-    @Test(expected = AirDroneExeptions.UserBadEmailException.class)
-    public void userNotValidEmailEx() {
-        accountService.addUser("user", "usermail.ru", "kmweiNIBQFIUb278h");
-    }
+        assertEquals(accountService.getUser("userusqfer@mail.ru"), null);
 
-    @Test(expected = AirDroneExeptions.UserBadPasswordException.class)
-    public void userBadPasswordEx() {
-        accountService.addUser("user", "user@mail.ru", "kmw2F");
-    }
-
-    @Test(expected = AirDroneExeptions.UserNotFoundException.class)
-    public void removeUser() throws Exception {
         accountService.addUser("user", "user@mail.ru", "kmweiNIBQFIUb278h");
-        accountService.removeUser("user@mail.ru", "kmweiNIBQFIUb278h");
-        accountService.getUser("user@mail.ru");
+        final UserProfile userProfile = accountService.getUser("user@mail.ru");
+        assertEquals(userProfile.getEmail(), "user@mail.ru");
+        assertEquals(userProfile.getUsername(), "user");
+        assertEquals(userProfile.getPassword(), "kmweiNIBQFIUb278h");
     }
 
     @Test
-    public void updateUser() throws Exception {
+    public void userNotValid() {
+
+        assertEquals(accountService.addUser("user", "usermail.ru", "kmweiNIBQFIUb278h"), false);
+        assertEquals(accountService.addUser("user", "user@mail.ru", "kmw2F"), false);
+    }
+
+
+    public void removeUser()  {
         accountService.addUser("user", "user@mail.ru", "kmweiNIBQFIUb278h");
-        accountService.updateUser("user1", "user@mail.ru", "kmweiNIBQFIUb278h", "newPassword10");
+        accountService.removeUser("user@mail.ru", "kmweiNIBQFIUb278h");
+        assertEquals(accountService.getUser("user@mail.ru"), null);
+    }
+
+    @Test
+    public void updateUser()  {
+        assertEquals(accountService.addUser("user", "user@mail.ru", "kmweiNIBQFIUb278h"), true);
+        assertEquals(accountService
+                .updateUser("user1", "user@mail.ru", "kmweiNIBQFIUb278h", "newPassword10"), true);
         final UserProfile userProfile = accountService.getUser("user@mail.ru");
         assertEquals(userProfile.getEmail(), "user@mail.ru");
         assertEquals(userProfile.getUsername(), "user1");

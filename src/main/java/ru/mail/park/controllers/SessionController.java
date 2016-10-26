@@ -7,12 +7,10 @@ import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.web.bind.annotation.*;
 import ru.mail.park.controllers.api.SignInRequest;
 import ru.mail.park.controllers.api.common.ResultJson;
-import ru.mail.park.controllers.api.exeptions.AirDroneExeptions;
 import ru.mail.park.service.interfaces.AbstractSessionService;
 
 import javax.servlet.http.HttpSession;
 
-import static ru.mail.park.controllers.api.exeptions.AirDroneExeptions.*;
 
 @RestController
 public class SessionController {
@@ -28,27 +26,14 @@ public class SessionController {
                                             produces = "application/json")
     public ResponseEntity signIn(@RequestBody SignInRequest body,
                                 HttpSession httpSession) {
-        try {
-            sessionService.signIn(httpSession.getId(), body.getEmail(), body.getPassword());
 
-        } catch (AirDroneExeptions.UserBadEmailException e) {
-            final String errJson = (new ResultJson<>(HttpStatus.FORBIDDEN.value(),
-                    e.getMessage())).getStringResult();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errJson);
-
-        } catch (UserNotFoundException e) {
-
-            final String errJson = (new ResultJson<>(HttpStatus.NOT_FOUND.value(),
-                    e.getMessage())).getStringResult();
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errJson);
-
-        } catch (UserPasswordsDoNotMatchException e) {
-            final String errJson = (new ResultJson<>(HttpStatus.FORBIDDEN.value(),
-                    e.getMessage())).getStringResult();
+        if(!sessionService.signIn(httpSession.getId(), body.getEmail(), body.getPassword())) {
+            final String errJson = (new ResultJson<>(HttpStatus.BAD_REQUEST.value(),
+                    HttpStatus.BAD_REQUEST)).getStringResult();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errJson);
         }
 
-        final String json = new ResultJson<>(HttpStatus.OK.value(), "OK").getStringResult();
+        final String json = new ResultJson<>(HttpStatus.OK.value(), HttpStatus.OK).getStringResult();
 
         return ResponseEntity.status(HttpStatus.OK).body(json);
     }
@@ -56,17 +41,15 @@ public class SessionController {
     @RequestMapping(path = "/session", method = RequestMethod.DELETE,
                                             produces = "application/json")
     public ResponseEntity signOut(HttpSession httpSession) {
-        try {
-            sessionService.signOut(httpSession.getId());
 
-            final String json = new ResultJson<>(HttpStatus.OK.value(), "OK").getStringResult();
-            return ResponseEntity.status(HttpStatus.OK).body(json);
-
-        } catch (AirDroneExeptions.NotLoggedInException e) {
+        if(!sessionService.signOut(httpSession.getId())) {
             final String errJson = (new ResultJson<>(HttpStatus.UNAUTHORIZED.value(),
-                   e.getMessage())).getStringResult();
+                    HttpStatus.UNAUTHORIZED)).getStringResult();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errJson);
         }
+
+        final String json = new ResultJson<>(HttpStatus.OK.value(), HttpStatus.OK).getStringResult();
+        return ResponseEntity.status(HttpStatus.OK).body(json);
     }
 
     @ExceptionHandler({CannotCreateTransactionException.class})
