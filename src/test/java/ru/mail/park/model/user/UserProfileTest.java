@@ -13,9 +13,9 @@ public class UserProfileTest {
     @Test
     public void testCreateUserProfile() {
         final UserProfile userProfile = new UserProfile("username", "user@mail.ru", "123456789");
-        assertEquals("user@mail.ru", userProfile.getEmail());
-        assertEquals("username", userProfile.getUsername());
-        assertEquals("123456789", userProfile.getPassword());
+        assertEquals(userProfile.getEmail(), "user@mail.ru");
+        assertEquals(userProfile.getUsername(), "username");
+        assertEquals(userProfile.getPassword(), "123456789");
     }
 
 }

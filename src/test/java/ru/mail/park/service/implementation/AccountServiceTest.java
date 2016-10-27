@@ -1,5 +1,6 @@
 package ru.mail.park.service.implementation;
 
+import org.jooq.exception.DataAccessException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,6 +45,12 @@ public class AccountServiceTest {
         assertEquals(userProfile.getEmail(), "user@mail.ru");
         assertEquals(userProfile.getUsername(), "user");
         assertEquals(userProfile.getPassword(), "kmweiNIBQFIUb278h");
+
+        try{
+            accountService.addUser("user", "user@mail.ru", "kmweiNIBQFIUb278h");
+        } catch (DataAccessException e) {
+            assertEquals(e.sqlState(), "23505");
+        }
     }
 
     @Test
