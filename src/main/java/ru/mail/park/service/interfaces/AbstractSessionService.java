@@ -6,10 +6,11 @@ import org.springframework.stereotype.Component;
  * Created by admin on 30.09.16.
  */
 @Component
-public interface ISessionService {
-    String addAuthorizedLogin(String cookie, String email);
+public interface AbstractSessionService {
+
+    boolean signIn(String cookie, String email, String password);
 
     String getAuthorizedEmail(String cookie);
 
-    boolean removeSession(String cookie);
+    boolean signOut(String cookie);
 }

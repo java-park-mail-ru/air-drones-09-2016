@@ -1,18 +1,19 @@
 package ru.mail.park.controllers.api;
 
-import ru.mail.park.controllers.api.abstractapi.AbstractRequest;
 
 /**
  * Created by admin on 06.10.16.
  */
-public final class PutUserRequest extends AbstractRequest {
+public final class PutUserRequest {
 
     private String username;
     private String newPassword;
+    private String email;
+    private String password;
 
-    private PutUserRequest() {}
+    public PutUserRequest() {}
 
-    private PutUserRequest(String email, String password, String username, String newPassword) {
+    public PutUserRequest(String email, String password, String username, String newPassword) {
         this.email       = email;
         this.password    = password;
         this.username    = username;
@@ -22,5 +23,13 @@ public final class PutUserRequest extends AbstractRequest {
     public String getUsername() {return username;}
 
     public String getNewPassword() {return newPassword;}
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
 
 }

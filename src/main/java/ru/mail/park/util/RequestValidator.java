@@ -1,5 +1,7 @@
 package ru.mail.park.util;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * Created by admin on 06.10.16.
  */
@@ -17,12 +19,12 @@ public class RequestValidator {
 
     private static final String PASSWORD_RULE = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$";
 
-    public static boolean emailValidate(String email) {
-        return email.matches(EMAIL_RULE);
+    public static boolean emailValidate(@Nullable String email) {
+        return !(email == null || !email.matches(EMAIL_RULE));
     }
 
-    public static boolean passwordValidate(String password) {
-        return password.matches(PASSWORD_RULE);
+    public static boolean passwordValidate(@Nullable String password) {
+        return !(password == null || !password.matches(PASSWORD_RULE));
     }
 
 
